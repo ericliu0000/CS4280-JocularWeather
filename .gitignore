@@ -1,4 +1,5 @@
 target/
 .vscode/
 ..idea/
-
+.env
+src/main/java/org/openjfx/Constants.java
