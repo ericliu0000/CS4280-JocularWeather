@@ -1,5 +1,9 @@
-module org.openjfx {
+module org.nothing.jocularweather {
     requires javafx.controls;
-
-    exports org.openjfx;
+    requires com.fasterxml.jackson.databind;
+//    requires javafx.fxml;
+            
+                            
+//    opens org.nothing.jocularweather to javafx.fxml;
+    exports org.nothing.jocularweather;
 }

@@ -1,5 +1,7 @@
-package org.openjfx;
+package org.nothing.jocularweather;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.scene.control.Label;
@@ -12,7 +14,6 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URI;
-import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -23,17 +24,6 @@ public class Main extends Application {
     static String API_KEY = getEnv("API_KEY");
     static String BASE_URL = getEnv("BASE_URL");
     static String ICON_URL = getEnv("ICON_URL");
-
-    @Override
-    public void start(Stage stage) {
-
-        String report = getWeatherReport("27560", "imperial");
-        System.out.println(report);
-        var label = new Label(API_KEY);
-        var scene = new Scene(new StackPane(label), 640, 480);
-        stage.setScene(scene);
-        stage.show();
-    }
 
     public static String getEnv(String key) {
         ArrayList<String> constants;
@@ -57,19 +47,17 @@ public class Main extends Application {
     }
 
     public static String getWeatherReport(String zipCode, String units) {
+        String combinedURL = BASE_URL + "?appid=" + API_KEY + "&zip=" + zipCode + "&units=" + units;
+        System.out.println(combinedURL);
         try {
-            String combinedURL = BASE_URL + "?appid=" + API_KEY + "&zip=" + zipCode + "&units=" + units;
-            System.out.println(combinedURL);
-            URL url = new URI(combinedURL).toURL();
-            HttpURLConnection con = (HttpURLConnection) url.openConnection();
+            HttpURLConnection connection = (HttpURLConnection) new URI(combinedURL).toURL().openConnection();
+            connection.setRequestMethod("GET");
 
-            con.setRequestMethod("GET");
+            int status = connection.getResponseCode();
 
-            int status = con.getResponseCode();
-
-            BufferedReader in = new BufferedReader(
-                    new InputStreamReader(con.getInputStream()));
+            BufferedReader in = new BufferedReader(new InputStreamReader(connection.getInputStream()));
             String inputLine;
+
             StringBuilder content = new StringBuilder();
             while ((inputLine = in.readLine()) != null) {
                 content.append(inputLine);
@@ -77,7 +65,6 @@ public class Main extends Application {
             in.close();
 
             return content.toString();
-
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -89,4 +76,21 @@ public class Main extends Application {
         launch();
     }
 
+    @Override
+    public void start(Stage stage) {
+        String report = getWeatherReport("27560", "imperial");
+        System.out.println(report);
+        ObjectMapper mapper = new ObjectMapper();
+        try {
+            System.out.println("Created mapper");
+            Report processedReport = mapper.readValue(report, Report.class);
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
+        }
+
+        var label = new Label(API_KEY);
+        var scene = new Scene(new StackPane(label), 640, 480);
+        stage.setScene(scene);
+        stage.show();
+    }
 }
