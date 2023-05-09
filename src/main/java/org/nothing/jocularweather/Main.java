@@ -21,9 +21,9 @@ import java.util.ArrayList;
 
 public class Main extends Application {
 
-    static String API_KEY = getEnv("API_KEY");
-    static String BASE_URL = getEnv("BASE_URL");
-    static String ICON_URL = getEnv("ICON_URL");
+    private static final String API_KEY = getEnv("API_KEY");
+    private static final String BASE_URL = getEnv("BASE_URL");
+    private static final String ICON_URL = getEnv("ICON_URL");
 
     public static String getEnv(String key) {
         ArrayList<String> constants;
@@ -36,11 +36,10 @@ public class Main extends Application {
                     return parts[1];
                 }
             }
-            System.out.println(constants.get(0));
         } catch (FileNotFoundException e) {
-            System.out.println("brr");
+            throw new RuntimeException("Environment variables not found");
         } catch (IOException e) {
-            System.out.println("Eeeee");
+            throw new RuntimeException(".env file could not be read");
         }
 
         return "";
@@ -81,6 +80,7 @@ public class Main extends Application {
         String report = getWeatherReport("27560", "imperial");
         System.out.println(report);
         ObjectMapper mapper = new ObjectMapper();
+
         try {
             System.out.println("Created mapper");
             Report processedReport = mapper.readValue(report, Report.class);
