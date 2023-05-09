@@ -2,6 +2,8 @@ package org.nothing.jocularweather;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.PropertyNamingStrategies;
+import com.fasterxml.jackson.databind.PropertyNamingStrategy;
 import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.scene.control.Label;
@@ -47,7 +49,7 @@ public class Main extends Application {
 
     public static String getWeatherReport(String zipCode, String units) {
         String combinedURL = BASE_URL + "?appid=" + API_KEY + "&zip=" + zipCode + "&units=" + units;
-        System.out.println(combinedURL);
+
         try {
             HttpURLConnection connection = (HttpURLConnection) new URI(combinedURL).toURL().openConnection();
             connection.setRequestMethod("GET");
@@ -77,9 +79,10 @@ public class Main extends Application {
 
     @Override
     public void start(Stage stage) {
-        String report = getWeatherReport("92704", "imperial");
+        String report = getWeatherReport("67401", "imperial");
         System.out.println(report);
         ObjectMapper mapper = new ObjectMapper();
+        mapper.setPropertyNamingStrategy(new PropertyNamingStrategies.SnakeCaseStrategy());
 
         try {
             Report processedReport = mapper.readValue(report, Report.class);
