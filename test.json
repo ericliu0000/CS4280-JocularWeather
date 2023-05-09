@@ -1,0 +1,43 @@
+{
+  "coord": {
+    "lon": -117.909,
+    "lat": 33.7249
+  },
+  "weather": [
+    {
+      "id": 804,
+      "main": "Clouds",
+      "description": "overcast clouds",
+      "icon": "04d"
+    }
+  ],
+  "base": "stations",
+  "main": {
+    "temp": 63.41,
+    "feels_like": 62.69,
+    "temp_min": 59.83,
+    "temp_max": 68.14,
+    "pressure": 1016,
+    "humidity": 69
+  },
+  "visibility": 10000,
+  "wind": {
+    "speed": 4.61,
+    "deg": 200
+  },
+  "clouds": {
+    "all": 100
+  },
+  "dt": 1683657555,
+  "sys": {
+    "type": 2,
+    "id": 2011658,
+    "country": "US",
+    "sunrise": 1683636937,
+    "sunset": 1683686434
+  },
+  "timezone": -25200,
+  "id": 0,
+  "name": "Santa Ana",
+  "cod": 200
+}

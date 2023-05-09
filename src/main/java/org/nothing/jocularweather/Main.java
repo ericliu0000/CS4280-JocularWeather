@@ -77,18 +77,18 @@ public class Main extends Application {
 
     @Override
     public void start(Stage stage) {
-        String report = getWeatherReport("27560", "imperial");
+        String report = getWeatherReport("92704", "imperial");
         System.out.println(report);
         ObjectMapper mapper = new ObjectMapper();
 
         try {
-            System.out.println("Created mapper");
             Report processedReport = mapper.readValue(report, Report.class);
         } catch (JsonProcessingException e) {
             e.printStackTrace();
+            throw new RuntimeException("nope the report is not set up correctly");
         }
 
-        var label = new Label(API_KEY);
+        var label = new Label(report);
         var scene = new Scene(new StackPane(label), 640, 480);
         stage.setScene(scene);
         stage.show();
