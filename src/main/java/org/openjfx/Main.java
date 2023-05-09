@@ -1,22 +1,21 @@
 package org.openjfx;
 
-import java.io.BufferedReader;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
-import java.net.URL;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.Arrays;
-
 import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.scene.control.Label;
 import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
+
+import java.io.BufferedReader;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.URI;
+import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.ArrayList;
 // import HttpUrlConnection
 
 public class Main extends Application {
@@ -37,7 +36,7 @@ public class Main extends Application {
     }
 
     public static String getEnv(String key) {
-        ArrayList<String> constants = new ArrayList<>();
+        ArrayList<String> constants;
 
         try {
             constants = (ArrayList<String>) Files.readAllLines(Path.of(".env"));
@@ -61,7 +60,7 @@ public class Main extends Application {
         try {
             String combinedURL = BASE_URL + "?appid=" + API_KEY + "&zip=" + zipCode + "&units=" + units;
             System.out.println(combinedURL);
-            URL url = new URL(combinedURL);
+            URL url = new URI(combinedURL).toURL();
             HttpURLConnection con = (HttpURLConnection) url.openConnection();
 
             con.setRequestMethod("GET");
@@ -71,7 +70,7 @@ public class Main extends Application {
             BufferedReader in = new BufferedReader(
                     new InputStreamReader(con.getInputStream()));
             String inputLine;
-            StringBuffer content = new StringBuffer();
+            StringBuilder content = new StringBuilder();
             while ((inputLine = in.readLine()) != null) {
                 content.append(inputLine);
             }
@@ -80,7 +79,7 @@ public class Main extends Application {
             return content.toString();
 
         } catch (Exception e) {
-            System.out.println(e);
+            e.printStackTrace();
         }
 
         return null;
