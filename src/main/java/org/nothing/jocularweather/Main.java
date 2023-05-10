@@ -20,6 +20,7 @@ import java.net.HttpURLConnection;
 import java.net.URI;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 
 public class Main extends Application {
@@ -56,7 +57,7 @@ public class Main extends Application {
             // int status = connection.getResponseCode();
 
             BufferedReader in = new BufferedReader(new InputStreamReader(connection.getInputStream()));
-            
+
             String inputLine;
 
             StringBuilder content = new StringBuilder();
@@ -110,6 +111,21 @@ public class Main extends Application {
             return false;
         }
 
+    }
+
+    public String getWeatherJoke() {
+        // random shrek quote
+        String origStr = null;
+        try {
+            origStr = Files.readString(Paths.get("src/main/resources/weather-jokes.txt"));
+        } catch (IOException e) {
+            System.out.println(e);
+            System.exit(0);
+        }
+
+        String[] lines = origStr.split("\n");
+        int selection = (int) (Math.random() * lines.length);
+        return lines[selection];
     }
 
     public static void main(String[] args) {
