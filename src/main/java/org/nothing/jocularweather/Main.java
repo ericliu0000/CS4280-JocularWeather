@@ -32,6 +32,24 @@ public class Main extends Application {
     private static final String API_KEY = getEnv("API_KEY");
     private static final String BASE_URL = getEnv("BASE_URL");
 
+    private static final Label titleLabel = new Label("JocularWeather.jar.EXE");
+    private static final TextField searchField = new TextField();
+    private static final Button searchButton = new Button("Search");
+    private static final HBox searchGroup = new HBox(searchField, searchButton);
+    private static final Label locationLabel = new Label("");
+    private static final InfoBox feelsLikeBox = new InfoBox("feels like", "");
+    private static final InfoBox tempBox = new InfoBox("temperature like", "");
+    private static final InfoBox conditionsBox = new InfoBox("conditions like", "");
+    private static final InfoBox sunriseBox = new InfoBox("sunrise like", "");
+    private static final InfoBox sunsetBox = new InfoBox("sunset like", "");
+    private static final FlowPane contentGroup = new FlowPane(feelsLikeBox, tempBox, conditionsBox, sunriseBox, sunsetBox);
+    private static final VBox contentBox = new VBox(locationLabel, contentGroup);
+    private static final Button jokeButton = new Button("Get Joke");
+    private static final Label jokeLabel = new Label();
+    private static final VBox jokeGroup = new VBox(jokeButton, jokeLabel);
+    private static final AnchorPane leftPane = new AnchorPane();
+    private static final VBox rightPane = new VBox();
+
     public static String getEnv(String key) {
         ArrayList<String> constants;
 
@@ -55,6 +73,10 @@ public class Main extends Application {
     public static String getWeatherReport(String zipCode, String units) {
         String combinedURL = BASE_URL + "?appid=" + API_KEY + "&zip=" + zipCode + "&units=" + units;
 
+        if (!isNumeric(zipCode)) {
+            combinedURL = BASE_URL + "?appid=" + API_KEY + "&q=" + zipCode + "&units=" + units;
+        }
+
         try {
             HttpURLConnection connection = (HttpURLConnection) new URI(combinedURL).toURL().openConnection();
             connection.setRequestMethod("GET");
@@ -72,6 +94,8 @@ public class Main extends Application {
             in.close();
 
             return content.toString();
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -138,14 +162,14 @@ public class Main extends Application {
         Date myDate = new Date(unixTime * 1000);
         DateFormat format = DateFormat.getDateInstance(DateFormat.SHORT);
         String dateString = format.format(myDate);
-        
+
         return dateString;
     }
 
-    public String getCurrentIP() {
-        String ipURL = "https://98q0kalf91.execute-api.us-east-1.amazonaws.com/ip";
+    public String getCurrentCity() {
+        String cityURL = "https://98q0kalf91.execute-api.us-east-1.amazonaws.com/ip";
         try {
-            HttpURLConnection connection = (HttpURLConnection) new URI(ipURL).toURL().openConnection();
+            HttpURLConnection connection = (HttpURLConnection) new URI(cityURL).toURL().openConnection();
             connection.setRequestMethod("GET");
             BufferedReader in = new BufferedReader(new InputStreamReader(connection.getInputStream()));
 
@@ -165,7 +189,6 @@ public class Main extends Application {
         }
     }
 
-
     public static void main(String[] args) {
         launch();
     }
@@ -184,6 +207,7 @@ public class Main extends Application {
 
         try {
             processedReport = mapper.readValue(report, Report.class);
+            // TODO catch this and like make sure it's a zip code or something
             pushToDB(zip);
         } catch (JsonProcessingException e) {
             throw new RuntimeException("THE REPORT IS NOT SET UP CORRECTLY!");
@@ -192,68 +216,60 @@ public class Main extends Application {
         return processedReport;
     }
 
-    // public void 
+    
 
-    @Override
-    public void start(Stage stage) {
-        Report report = getWeatherReport("08540");
-        // get variables needed from weather report
+    public void formatReport(Report report) {
         double feelsLike = report.main().feels_like();
         double temp = report.main().temp();
         String conditions = report.weather().get(0).main();
-        String icon = report.weather().get(0).icon();
+        // String icon = report.weather().get(0).icon();
         long timeZone = report.timezone();
         String sunriseTime = getHourlyTime(report.sys().sunrise(), timeZone);
         String sunsetTime = getHourlyTime(report.sys().sunset(), timeZone);
-        String country = report.sys().country();
-        String city = report.name();
+        // String country = report.sys().country();
+        // String city = report.name();
 
-        var titleLabel = new Label("JocularWeather.jar.EXE");
+        feelsLikeBox.setContentText(String.valueOf(feelsLike));
+        tempBox.setContentText(String.valueOf(temp));
+        conditionsBox.setContentText(conditions);
+        sunriseBox.setContentText(sunriseTime);
+        sunsetBox.setContentText(sunsetTime);
+    }
 
-        var searchField = new TextField();
+    @Override
+    public void start(Stage stage) {
+        // Report report = getWeatherReport("08540");
+
+        // formatReport(report);
+        // locationLabel.setText(String.format("%s, %s", report.name(), report.sys.country()));
+
         searchField.setPromptText("Enter ZIP Code...");
-        var searchButton = new Button("Search");
         searchButton.setOnAction((e) -> {
-            Report newReport = getWeatherReport(searchButton.getText());
-            // getData(e.value()));
-            // Report report_ = getWeatherReport(searchButton.getText());
+            Report report = getWeatherReport(searchField.getText());
+
+            formatReport(report);
+            locationLabel.setText(String.format("%s, %s", report.name(), report.sys().country()));
         });
-        var searchGroup = new HBox(searchField, searchButton);
         searchGroup.setAlignment(Pos.CENTER);
-        
-        var locationLabel = new Label(String.format("%s, %s", city, country));
-        
-        var feelsLikeBox = new InfoBox("feels like", String.valueOf(feelsLike));
-        var tempBox = new InfoBox("temperature like", String.valueOf(temp));
-        var conditionsBox = new InfoBox("conditions like", conditions);
-        var sunriseBox = new InfoBox("sunrise like", sunriseTime);
-        var sunsetBox = new InfoBox("sunset like", sunsetTime);
-        var contentGroup = new FlowPane(feelsLikeBox, tempBox, conditionsBox, sunriseBox, sunsetBox);
-        
+
         contentGroup.setPrefWidth(400);
         contentGroup.setAlignment(Pos.CENTER);
         contentGroup.setHgap(20);
         contentGroup.setVgap(20);
-        
-        var contentBox = new VBox(locationLabel, contentGroup);
+
         contentBox.setAlignment(Pos.CENTER);
-        
-        var jokeButton = new Button("Get Joke");
-        var jokeLabel = new Label();
+
         jokeButton.setOnAction((e) -> {
-            String joke = getWeatherJoke();
-            jokeLabel.setText(joke);
-            System.out.println(joke);
+            jokeLabel.setText(getWeatherJoke());
         });
 
-        var jokeGroup = new HBox(jokeButton, jokeLabel);
         jokeGroup.setAlignment(Pos.CENTER);
 
-        var leftPane = new AnchorPane();
-        var rightPane = new VBox();
         rightPane.setAlignment(Pos.CENTER);
         rightPane.getChildren().addAll(titleLabel, searchGroup, locationLabel, contentBox, jokeGroup);
-        
+
+        System.out.println(getCurrentCity());
+
         var scene = new Scene(rightPane, 640, 480);
         scene.getStylesheets().add("style.css");
 
