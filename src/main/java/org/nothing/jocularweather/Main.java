@@ -79,13 +79,14 @@ public class Main extends Application {
 
     @Override
     public void start(Stage stage) {
-        String report = getWeatherReport("67401", "imperial");
+        String report = getWeatherReport("65622", "imperial");
         System.out.println(report);
         ObjectMapper mapper = new ObjectMapper();
         mapper.setPropertyNamingStrategy(new PropertyNamingStrategies.SnakeCaseStrategy());
 
         try {
             Report processedReport = mapper.readValue(report, Report.class);
+            System.out.println(processedReport.rain()._1h());
         } catch (JsonProcessingException e) {
             e.printStackTrace();
             throw new RuntimeException("nope the report is not set up correctly");
