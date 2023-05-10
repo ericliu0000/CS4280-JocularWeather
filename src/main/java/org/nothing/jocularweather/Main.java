@@ -42,7 +42,8 @@ public class Main extends Application {
     private static final InfoBox conditionsBox = new InfoBox("conditions like", "");
     private static final InfoBox sunriseBox = new InfoBox("sunrise like", "");
     private static final InfoBox sunsetBox = new InfoBox("sunset like", "");
-    private static final FlowPane contentGroup = new FlowPane(feelsLikeBox, tempBox, conditionsBox, sunriseBox, sunsetBox);
+    private static final FlowPane contentGroup = new FlowPane(feelsLikeBox, tempBox, conditionsBox, sunriseBox,
+            sunsetBox);
     private static final VBox contentBox = new VBox(locationLabel, contentGroup);
     private static final Button jokeButton = new Button("Get Joke");
     private static final Label jokeLabel = new Label();
@@ -216,8 +217,6 @@ public class Main extends Application {
         return processedReport;
     }
 
-    
-
     public void formatReport(Report report) {
         double feelsLike = report.main().feels_like();
         double temp = report.main().temp();
@@ -241,7 +240,12 @@ public class Main extends Application {
         // Report report = getWeatherReport("08540");
 
         // formatReport(report);
-        // locationLabel.setText(String.format("%s, %s", report.name(), report.sys.country()));
+        // locationLabel.setText(String.format("%s, %s", report.name(),
+        // report.sys.country()));
+
+        Report r = getWeatherReport(getCurrentCity());
+        formatReport(r);
+        locationLabel.setText(String.format("Current Location: %s,%s", r.name(), r.sys().country()));
 
         searchField.setPromptText("Enter ZIP Code...");
         searchButton.setOnAction((e) -> {
