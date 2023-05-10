@@ -25,7 +25,6 @@ public class Main extends Application {
 
     private static final String API_KEY = getEnv("API_KEY");
     private static final String BASE_URL = getEnv("BASE_URL");
-    private static final String ICON_URL = getEnv("ICON_URL");
 
     public static String getEnv(String key) {
         ArrayList<String> constants;
@@ -54,7 +53,7 @@ public class Main extends Application {
             HttpURLConnection connection = (HttpURLConnection) new URI(combinedURL).toURL().openConnection();
             connection.setRequestMethod("GET");
 
-            int status = connection.getResponseCode();
+            // int status = connection.getResponseCode();
 
             BufferedReader in = new BufferedReader(new InputStreamReader(connection.getInputStream()));
             String inputLine;
@@ -87,6 +86,21 @@ public class Main extends Application {
         try {
             Report processedReport = mapper.readValue(report, Report.class);
             System.out.println(processedReport.rain()._1h());
+
+            double feelsLike = processedReport.main().feels_like();
+            double temp = processedReport.main().temp();
+            String conditions = processedReport.weather().get(0).main();
+            String icon = processedReport.weather().get(0).icon();
+            long sunrise = processedReport.sys().sunrise();
+            long sunset = processedReport.sys().sunset();
+
+            System.out.println("feels like: " + feelsLike);
+            System.out.println("temp: " + temp);
+            System.out.println("conditions: " + conditions);
+            System.out.println("icon: " + icon);
+            System.out.println("sunrise: " + sunrise);
+            System.out.println("sunset: " + sunset);
+
         } catch (JsonProcessingException e) {
             e.printStackTrace();
             throw new RuntimeException("nope the report is not set up correctly");
