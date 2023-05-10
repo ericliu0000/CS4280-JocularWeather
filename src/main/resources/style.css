@@ -1,29 +1,33 @@
 @font-face {
-  src: url("IBMPlexSansVar-Roman.ttf");
+    src: url("IBMPlexSansVar-Roman.ttf");
 }
 
 .vbox {
-  -fx-background-color: #f7e1c3;
+    -fx-background-color: #ff00bf;
+}
+
+.stack-pane {
+    -fx-background-color: #ff00bf;
 }
 
 * {
-  -fx-font-family: "IBM Plex Sans", sans-serif;
+    -fx-font-family: "IBM Plex Sans", sans-serif;
 }
 
 #title-label {
-  -fx-font-weight: bold;
-  -fx-font-size: 48px;
+    -fx-font-weight: bold;
+    -fx-font-size: 48px;
 }
 
 #timer-label {
-  -fx-font-size: 64px;
+    -fx-font-size: 64px;
 }
 
 #mode-label {
-  -fx-background-color: #00b3ff;
-  -fx-text-fill: white;
-  -fx-padding: 2px 5px 2px 5px;
-  -fx-background-radius: 50px;
+    -fx-background-color: #00b3ff;
+    -fx-text-fill: white;
+    -fx-padding: 2px 5px 2px 5px;
+    -fx-background-radius: 50px;
 
-  -fx-border-radius: 50px;
+    -fx-border-radius: 50px;
 }
