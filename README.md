@@ -7,4 +7,4 @@ We created an AWS Lambda function that can receive a zip code and store it in a 
 This serverless function was written in `node.js` using the Serverless framework, which makes deploying to AWS easier.
 
 Documentation:
-`POST` `https://98q0kalf91.execute-api.us-east-1.amazonaws.com?zip=five_digit_zip_code>`
+`POST` `<https://98q0kalf91.execute-api.us-east-1.amazonaws.com?zip=five_digit_zip_code>`

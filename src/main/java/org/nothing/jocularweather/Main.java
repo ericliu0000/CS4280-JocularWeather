@@ -72,6 +72,45 @@ public class Main extends Application {
         return null;
     }
 
+    public static boolean isNumeric(String str) {
+        try {
+            double d = Double.parseDouble(str);
+        } catch (NumberFormatException e) {
+            return false;
+        }
+
+        return true;
+    }
+
+    public static boolean isZipCode(String str) {
+        return str.length() == 5 && isNumeric(str);
+    }
+
+    public static boolean pushToDB(String zipCode) {
+        String useURL = "https://98q0kalf91.execute-api.us-east-1.amazonaws.com/?zip=" + zipCode;
+
+        try {
+            HttpURLConnection connection = (HttpURLConnection) new URI(useURL).toURL().openConnection();
+            connection.setRequestMethod("GET");
+            BufferedReader in = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+
+            String inputLine;
+
+            StringBuilder content = new StringBuilder();
+            while ((inputLine = in.readLine()) != null) {
+                content.append(inputLine);
+            }
+            in.close();
+
+            return true;
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+
+    }
+
     public static void main(String[] args) {
         launch();
     }
@@ -85,7 +124,7 @@ public class Main extends Application {
 
         try {
             Report processedReport = mapper.readValue(report, Report.class);
-            System.out.println(processedReport.rain()._1h());
+            // System.out.println(processedReport.rain()._1h());
 
             double feelsLike = processedReport.main().feels_like();
             double temp = processedReport.main().temp();
@@ -100,6 +139,8 @@ public class Main extends Application {
             System.out.println("icon: " + icon);
             System.out.println("sunrise: " + sunrise);
             System.out.println("sunset: " + sunset);
+
+            pushToDB("27560");
 
         } catch (JsonProcessingException e) {
             e.printStackTrace();
