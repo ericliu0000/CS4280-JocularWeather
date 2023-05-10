@@ -3,10 +3,12 @@ package org.nothing.jocularweather;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
-import com.fasterxml.jackson.databind.PropertyNamingStrategy;
 import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.scene.control.Label;
+import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.FlowPane;
+import javafx.scene.layout.GridPane;
 import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
 
@@ -19,10 +21,8 @@ import java.net.URI;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
-// import HttpUrlConnection
 
 public class Main extends Application {
-
     private static final String API_KEY = getEnv("API_KEY");
     private static final String BASE_URL = getEnv("BASE_URL");
 
@@ -56,6 +56,7 @@ public class Main extends Application {
             // int status = connection.getResponseCode();
 
             BufferedReader in = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+            
             String inputLine;
 
             StringBuilder content = new StringBuilder();
@@ -118,13 +119,15 @@ public class Main extends Application {
     @Override
     public void start(Stage stage) {
         String report = getWeatherReport("65622", "imperial");
+        Report processedReport;
+
         System.out.println(report);
+
         ObjectMapper mapper = new ObjectMapper();
         mapper.setPropertyNamingStrategy(new PropertyNamingStrategies.SnakeCaseStrategy());
 
         try {
-            Report processedReport = mapper.readValue(report, Report.class);
-            // System.out.println(processedReport.rain()._1h());
+            processedReport = mapper.readValue(report, Report.class);
 
             double feelsLike = processedReport.main().feels_like();
             double temp = processedReport.main().temp();
@@ -141,14 +144,22 @@ public class Main extends Application {
             System.out.println("sunset: " + sunset);
 
             pushToDB("27560");
-
         } catch (JsonProcessingException e) {
             e.printStackTrace();
             throw new RuntimeException("nope the report is not set up correctly");
         }
 
+        // TODO add this
+        var leftPane = new AnchorPane();
+
+        var titleLabel = new Label("JocularWeather");
+
+        var rightPane = new GridPane();
+
+        var contentPane = new FlowPane();
+
         var label = new Label(report);
-        var scene = new Scene(new StackPane(label), 640, 480);
+        var scene = new Scene(new StackPane(label, new InfoBox("fart", new Label("poop"))), 640, 480);
         stage.setScene(scene);
         stage.show();
     }
