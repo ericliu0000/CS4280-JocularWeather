@@ -71,6 +71,20 @@ public class Main extends Application {
         return "";
     }
 
+    public static String[] getSavedLocations() {
+        String origStr = null;
+        try {
+            origStr = Files.readString(Paths.get("src/main/resources/locationStorage.txt"));
+        } catch (IOException e) {
+            System.out.println(e);
+            System.exit(0);
+        }
+
+        String[] lines = origStr.split("\n");
+
+        return lines;
+    }
+
     public static String getWeatherReport(String zipCode, String units) {
         String combinedURL = BASE_URL + "?appid=" + API_KEY + "&zip=" + zipCode + "&units=" + units;
 
@@ -208,13 +222,63 @@ public class Main extends Application {
 
         try {
             processedReport = mapper.readValue(report, Report.class);
-            // TODO catch this and like make sure it's a zip code or something
             pushToDB(zip);
         } catch (JsonProcessingException e) {
             throw new RuntimeException("THE REPORT IS NOT SET UP CORRECTLY!");
         }
 
         return processedReport;
+    }
+
+    public boolean removeZipFromSaved(String zip) {
+        String[] zips = getSavedLocations();
+        String newZips = "";
+
+        for (String z : zips) {
+            if (!z.equals(zip)) {
+                newZips += z + "\n";
+            }
+        }
+
+        try {
+            Files.writeString(Paths.get("src/main/resources/locationStorage.txt"), newZips);
+        } catch (IOException e) {
+            System.out.println(e);
+            return false;
+        }
+
+        return true;
+    }
+
+    public boolean addZipToSaved(String zip) {
+        String[] zips = getSavedLocations();
+        String newZips = "";
+
+        for (String z : zips) {
+            newZips += z + "\n";
+        }
+
+        newZips += zip + "\n";
+
+        try {
+            Files.writeString(Paths.get("src/main/resources/locationStorage.txt"), newZips);
+        } catch (IOException e) {
+            System.out.println(e);
+            return false;
+        }
+
+        return true;
+    }
+
+    public Report[] getWeatherReports(String[] zips) {
+        // for saved locations
+        Report[] reports = new Report[zips.length];
+
+        for (int i = 0; i < zips.length; i++) {
+            reports[i] = getWeatherReport(zips[i]);
+        }
+
+        return reports;
     }
 
     public void formatReport(Report report) {
