@@ -71,20 +71,6 @@ public class Main extends Application {
         return "";
     }
 
-    public static String[] getSavedLocations() {
-        String origStr = null;
-        try {
-            origStr = Files.readString(Paths.get("src/main/resources/locationStorage.txt"));
-        } catch (IOException e) {
-            System.out.println(e);
-            System.exit(0);
-        }
-
-        String[] lines = origStr.split("\n");
-
-        return lines;
-    }
-
     public static String getWeatherReport(String zipCode, String units) {
         String combinedURL = BASE_URL + "?appid=" + API_KEY + "&zip=" + zipCode + "&units=" + units;
 
@@ -228,6 +214,20 @@ public class Main extends Application {
         }
 
         return processedReport;
+    }
+
+    public static String[] getSavedLocations() {
+        String origStr = null;
+        try {
+            origStr = Files.readString(Paths.get("src/main/resources/locationStorage.txt"));
+        } catch (IOException e) {
+            System.out.println(e);
+            System.exit(0);
+        }
+
+        String[] lines = origStr.split("\n");
+
+        return lines;
     }
 
     public boolean removeZipFromSaved(String zip) {
