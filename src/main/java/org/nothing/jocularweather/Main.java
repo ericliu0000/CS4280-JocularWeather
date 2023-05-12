@@ -1,9 +1,7 @@
 package org.nothing.jocularweather;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import javafx.application.Application;
+import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
@@ -15,25 +13,15 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
-import java.io.BufferedReader;
-import java.io.FileNotFoundException;
-import java.io.FileWriter;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
-import java.net.URI;
 import java.nio.file.Files;
-import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.text.DateFormat;
-import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
 
 public class Main extends Application {
-    private static final String API_KEY = getEnv("API_KEY");
-    private static final String BASE_URL = getEnv("BASE_URL");
 
     private static final Label titleLabel = new Label("JocularWeather.jar.EXE");
     private static final TextField searchField = new TextField();
@@ -45,81 +33,16 @@ public class Main extends Application {
     private static final InfoBox conditionsBox = new InfoBox("conditions like", "");
     private static final InfoBox sunriseBox = new InfoBox("sunrise like", "");
     private static final InfoBox sunsetBox = new InfoBox("sunset like", "");
-    private static final FlowPane contentGroup = new FlowPane(feelsLikeBox, tempBox, conditionsBox, sunriseBox,
-            sunsetBox);
+    private static final FlowPane contentGroup = new FlowPane(feelsLikeBox, tempBox, conditionsBox, sunriseBox, sunsetBox);
     private static final VBox contentBox = new VBox(locationLabel, contentGroup);
     private static final Button jokeButton = new Button("Get Joke");
     private static final Label jokeLabel = new Label();
     private static final VBox jokeGroup = new VBox(jokeButton, jokeLabel);
     private static final AnchorPane leftPane = new AnchorPane();
     private static final VBox rightPane = new VBox();
+    private final Fetcher fetcher = new Fetcher();
 
     /**
-     * 
-     * @param key
-     * @return
-     */
-    public static String getEnv(String key) {
-        ArrayList<String> constants;
-
-        try {
-            constants = (ArrayList<String>) Files.readAllLines(Path.of(".env"));
-            for (String constant : constants) {
-                String[] parts = constant.split("=");
-                if (parts[0].equals(key)) {
-                    return parts[1];
-                }
-            }
-        } catch (FileNotFoundException e) {
-            throw new RuntimeException("Environment variables not found");
-        } catch (IOException e) {
-            throw new RuntimeException(".env file could not be read");
-        }
-
-        return "";
-    }
-
-    /**
-     * 
-     * @param zipCode
-     * @param units
-     * @return
-     */
-    public static String getWeatherReport(String zipCode, String units) {
-        String combinedURL = BASE_URL + "?appid=" + API_KEY + "&zip=" + zipCode + "&units=" + units;
-
-        if (!isNumeric(zipCode)) {
-            combinedURL = BASE_URL + "?appid=" + API_KEY + "&q=" + zipCode + "&units=" + units;
-        }
-
-        try {
-            HttpURLConnection connection = (HttpURLConnection) new URI(combinedURL).toURL().openConnection();
-            connection.setRequestMethod("GET");
-
-            // int status = connection.getResponseCode();
-
-            BufferedReader in = new BufferedReader(new InputStreamReader(connection.getInputStream()));
-
-            String inputLine;
-
-            StringBuilder content = new StringBuilder();
-            while ((inputLine = in.readLine()) != null) {
-                content.append(inputLine);
-            }
-            in.close();
-
-            return content.toString();
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-        return null;
-    }
-
-    /**
-     * 
      * @param str
      * @return
      */
@@ -135,46 +58,24 @@ public class Main extends Application {
     }
 
     /**
-     * 
-     * @param str
+     * @param unixTime
+     * @param timeZone
      * @return
      */
-    public static boolean isZipCode(String str) {
-        return str.length() == 5 && isNumeric(str);
+    public static String getHourlyTime(long unixTime, long timeZone) {
+        Date myDate = new Date(unixTime * 1000);
+        Calendar time = Calendar.getInstance();
+        time.setTime(myDate);
+        DateFormat format = DateFormat.getTimeInstance(DateFormat.SHORT, Locale.UK);
+
+        return format.format(myDate);
+    }
+
+    public static void main(String[] args) {
+        launch();
     }
 
     /**
-     * 
-     * @param zipCode
-     * @return
-     */
-    public static boolean pushToDB(String zipCode, double lon, double lat) {
-        String useURL = "https://98q0kalf91.execute-api.us-east-1.amazonaws.com/pushdb?zip=" + zipCode + "&lon=" + lon + "&lat=" + lat;
-
-        try {
-            HttpURLConnection connection = (HttpURLConnection) new URI(useURL).toURL().openConnection();
-            connection.setRequestMethod("GET");
-            BufferedReader in = new BufferedReader(new InputStreamReader(connection.getInputStream()));
-
-            String inputLine;
-
-            StringBuilder content = new StringBuilder();
-            while ((inputLine = in.readLine()) != null) {
-                content.append(inputLine);
-            }
-            in.close();
-
-            return true;
-
-        } catch (Exception e) {
-            e.printStackTrace();
-            return false;
-        }
-
-    }
-
-    /**
-     * 
      * @return
      */
     public String getWeatherJoke() {
@@ -189,156 +90,6 @@ public class Main extends Application {
         String[] lines = origStr.split("\n");
         int selection = (int) (Math.random() * lines.length);
         return lines[selection];
-    }
-
-    /**
-     * 
-     * @param unixTime
-     * @param timeZone
-     * @return
-     */
-    public static String getHourlyTime(long unixTime, long timeZone) {
-        Date myDate = new Date(unixTime * 1000);
-        Calendar time = Calendar.getInstance();
-        time.setTime(myDate);
-        // time.setTime;
-        DateFormat format = DateFormat.getTimeInstance(DateFormat.SHORT, Locale.UK);
-        String dateString = format.format(myDate);
-
-        return dateString;
-    }
-
-    public String getCurrentCity() {
-        String cityURL = "https://98q0kalf91.execute-api.us-east-1.amazonaws.com/ip";
-        try {
-            HttpURLConnection connection = (HttpURLConnection) new URI(cityURL).toURL().openConnection();
-            connection.setRequestMethod("GET");
-            BufferedReader in = new BufferedReader(new InputStreamReader(connection.getInputStream()));
-
-            String inputLine;
-
-            StringBuilder content = new StringBuilder();
-            while ((inputLine = in.readLine()) != null) {
-                content.append(inputLine);
-            }
-            in.close();
-
-            return content.toString();
-
-        } catch (Exception e) {
-            e.printStackTrace();
-            return "";
-        }
-    }
-
-    public static void main(String[] args) {
-        launch();
-    }
-
-    /**
-     * 
-     * @param zip
-     * @return
-     */
-    public Report getWeatherReport(String zip) {
-        String report = getWeatherReport(zip, "imperial");
-        Report processedReport;
-
-        ObjectMapper mapper = new ObjectMapper();
-        mapper.setPropertyNamingStrategy(new PropertyNamingStrategies.SnakeCaseStrategy());
-
-        try {
-            processedReport = mapper.readValue(report, Report.class);
-
-            pushToDB(zip, processedReport.coord().lon(), processedReport.coord().lat());
-        } catch (JsonProcessingException e) {
-            throw new RuntimeException("THE REPORT IS NOT SET UP CORRECTLY!");
-        }
-
-        return processedReport;
-    }
-
-    public static String[] getSavedLocations() {
-        String origStr = null;
-        try {
-            origStr = Files.readString(Paths.get("src/main/resources/locationStorage.txt"));
-        } catch (IOException e) {
-            System.out.println(e);
-            System.exit(0);
-        }
-
-        String[] lines = origStr.split("\n");
-
-        return lines;
-    }
-
-    /**
-     * 
-     * @param zip
-     * @return
-     */
-    public boolean removeZipFromSaved(String zip) {
-          if (!(zip.length() == 5)) {
-            return false; // the zipcode length must be 5
-        }
-
-        String[] zips = getSavedLocations();
-        String newZips = "";
-
-        for (String z : zips) {
-            if (!z.equals(zip)) {
-                newZips += z + "\n";
-            }
-        }
-
-        try {
-            Files.writeString(Paths.get("src/main/resources/locationStorage.txt"), newZips);
-        } catch (IOException e) {
-            System.out.println(e);
-            return false;
-        }
-
-        return true;
-    }
-
-    /**
-     * 
-     * @param zip
-     * @return
-     */
-    public boolean addZipToSaved(String zip) {
-        if (!(zip.length() == 5)) {
-            return false; // the zipcode length must be 5
-        }
-
-        // String[] zips = getSavedLocations();
-        // String newZips = String.join("\n", zips);
-
-        // // for (String z : zips) {
-        // //     newZips += z + "\n";
-        // // }
-
-        // newZips += zip + "\n";
-
-        try (FileWriter writer = new FileWriter("src/main/resources/locationStorage.txt")) {
-            // Files.writeString(Paths.get("src/main/resources/locationStorage.txt"), newZips);
-            writer.append(zip);
-            return true;
-        } catch (IOException e) {
-            e.printStackTrace();
-            return false;
-        }
-    }
-
-    public Report[] getWeatherReports(String[] zips) {
-        // for saved locations
-        Report[] reports = new Report[zips.length];
-
-        for (int i = 0; i < zips.length; i++) {
-            reports[i] = getWeatherReport(zips[i]);
-        }
-
-        return reports;
     }
 
     public void formatReport(Report report) {
@@ -358,26 +109,25 @@ public class Main extends Application {
 
     @Override
     public void start(Stage stage) {
-        // Report report = getWeatherReport("08540");
-
         // formatReport(report);
         // locationLabel.setText(String.format("%s, %s", report.name(),
         // report.sys.country()));
 
-        String[] savedLocations = getSavedLocations();
-        Report[] savedLocationReports = getWeatherReports(savedLocations);
+        String[] savedLocations = Fetcher.getSavedLocations();
+        Report[] savedLocationReports = fetcher.getWeatherReports(savedLocations);
 
-        for (int i=0; i<savedLocationReports.length; i++) {
-            System.out.println(savedLocationReports[i]);
+        for (Report savedLocationReport : savedLocationReports) {
+            System.out.println(savedLocationReport);
         }
 
-        Report r = getWeatherReport(getCurrentCity());
+        Report r = fetcher.getWeatherReport(fetcher.getCurrentCity());
         formatReport(r);
+
         locationLabel.setText(String.format("Current Location: %s,%s", r.name(), r.sys().country()));
 
         searchField.setPromptText("Enter ZIP Code...");
         searchButton.setOnAction((e) -> {
-            Report report = getWeatherReport(searchField.getText());
+            Report report = fetcher.getWeatherReport(searchField.getText());
 
             formatReport(report);
             locationLabel.setText(String.format("%s, %s", report.name(), report.sys().country()));
@@ -391,16 +141,14 @@ public class Main extends Application {
 
         contentBox.setAlignment(Pos.CENTER);
 
-        jokeButton.setOnAction((e) -> {
-            jokeLabel.setText(getWeatherJoke());
-        });
+        jokeButton.setOnAction((e) -> jokeLabel.setText(getWeatherJoke()));
 
         jokeGroup.setAlignment(Pos.CENTER);
 
         rightPane.setAlignment(Pos.CENTER);
         rightPane.getChildren().addAll(titleLabel, searchGroup, locationLabel, contentBox, jokeGroup);
 
-        System.out.println(getCurrentCity());
+        System.out.println(fetcher.getCurrentCity());
 
         var scene = new Scene(rightPane, 640, 480);
         scene.getStylesheets().add("style.css");

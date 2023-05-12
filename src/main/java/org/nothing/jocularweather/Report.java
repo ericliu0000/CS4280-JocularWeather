@@ -21,8 +21,8 @@ import java.util.List;
  * @param cod        internal parameter
  */
 public record Report(Coordinates coord, List<Weather> weather, String base, Details main, int visibility, Wind wind,
-        Clouds clouds, Rain rain, Snow snow, int dt, WxSystem sys, int timezone, int id, String name,
-        int cod) {
+                     Clouds clouds, Rain rain, Snow snow, int dt, WxSystem sys, int timezone, int id, String name,
+                     int cod) {
     @Override
     public String toString() {
         return String.format("Weather report for %s", name);
@@ -75,7 +75,7 @@ record Weather(int id, String main, String description, String icon) {
  * @param grnd_level barometric pressure at ground level in hPa
  */
 record Details(double temp, double feels_like, double temp_min, double temp_max, int pressure, int humidity,
-        int sea_level, int grnd_level) {
+               int sea_level, int grnd_level) {
     @Override
     public String toString() {
         String content = """
@@ -109,7 +109,7 @@ record Wind(double speed, int deg, double gust) {
 record Clouds(int all) {
     @Override
     public String toString() {
-        return String.format("%s%", all);
+        return String.format("%s percent", all);
     }
 }
 

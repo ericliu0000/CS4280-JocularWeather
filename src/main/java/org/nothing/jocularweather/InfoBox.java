@@ -7,17 +7,17 @@ import javafx.scene.control.Label;
 import javafx.scene.layout.VBox;
 
 public class InfoBox extends VBox {
-    private Label headerLabel;
-    private Label contentLabel;
+    private final Label contentLabel;
 
     /**
-     * 
-     * @param title
-     * @param body
-     * @param children
+     * Creates InfoBox object for displaying weather report data
+     *
+     * @param title    text to go in title
+     * @param body     body text
+     * @param children any additional nodes
      */
     public InfoBox(String title, String body, Node... children) {
-        headerLabel = new Label(title);
+        Label headerLabel = new Label(title);
         contentLabel = new Label(body);
 
         this.setAlignment(Pos.CENTER);
@@ -26,20 +26,14 @@ public class InfoBox extends VBox {
         this.getChildren().addAll(headerLabel, contentLabel);
         this.getChildren().addAll(children);
     }
-    
+
     /**
-     * 
-     * @param text
+     * Set body text
+     *
+     * @param text desired text
      */
     public void setContentText(String text) {
         contentLabel.setText(text);
     }
 
-    /**
-     * 
-     * @param text
-     */
-    public void setHeaderText(String text) {
-        headerLabel.setText(text);
-    }
 }
