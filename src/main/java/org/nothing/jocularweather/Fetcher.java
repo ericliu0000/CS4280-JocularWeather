@@ -20,8 +20,10 @@ public class Fetcher {
     }
 
     /**
-     * @param key
-     * @return
+     * Returns environment variable with desired key
+     *
+     * @param key name of key
+     * @return String environment variable value
      */
     public static String getEnv(String key) {
         ArrayList<String> constants;
@@ -44,7 +46,11 @@ public class Fetcher {
     }
 
     /**
-     * @param zipCode
+     * Push location to database
+     *
+     * @param zipCode ZIP code or location
+     * @param lon     longitude
+     * @param lat     latitude
      */
     public static void pushToDB(String zipCode, double lon, double lat) {
         String useURL = "https://98q0kalf91.execute-api.us-east-1.amazonaws.com/pushdb?zip=" + zipCode + "&lon=" + lon + "&lat=" + lat;
@@ -61,18 +67,25 @@ public class Fetcher {
 
     }
 
-    public static String[] getSavedLocations() {
-        String origStr = null;
+    /**
+     * Returns saved locations in local file
+     *
+     * @return ArrayList of strings containing the locations
+     */
+    public static ArrayList<String> getSavedLocations() {
         try {
-            origStr = Files.readString(Paths.get("src/main/resources/locationStorage.txt"));
+            return (ArrayList<String>) Files.readAllLines(Paths.get("src/main/resources/locationStorage.txt"));
         } catch (IOException e) {
             e.printStackTrace();
-            System.exit(0);
+            throw new RuntimeException(e);
         }
-
-        return origStr.split("\n");
     }
 
+    /**
+     * Pull current city from user IP
+     *
+     * @return String city, blank if not found
+     */
     public String getCurrentCity() {
         String cityURL = "https://98q0kalf91.execute-api.us-east-1.amazonaws.com/ip";
         try {
@@ -97,8 +110,10 @@ public class Fetcher {
     }
 
     /**
-     * @param zipCode
-     * @return
+     * Get weather report from API
+     *
+     * @param zipCode desired ZIP code or city name to find location at
+     * @return Report object representing unpacked JSON data
      */
     public Report getWeatherReport(String zipCode) {
         // TODO fix this !
@@ -142,15 +157,17 @@ public class Fetcher {
     }
 
     /**
-     * @param zip
-     * @return
+     * Remove ZIP from list of stored ZIP codes
+     *
+     * @param zip target ZIP code to remove
+     * @return whether method succeeded
      */
     public boolean removeZipFromSaved(String zip) {
         if (!(zip.length() == 5)) {
-            return false; // the zipcode length must be 5
+            return false;
         }
 
-        String[] zips = getSavedLocations();
+        ArrayList<String> zips = getSavedLocations();
         StringBuilder newZips = new StringBuilder();
 
         for (String z : zips) {
@@ -170,8 +187,10 @@ public class Fetcher {
     }
 
     /**
-     * @param zip
-     * @return
+     * Save ZIP code to local file
+     *
+     * @param zip zip code to save
+     * @return whether method succeeded
      */
     public boolean addZipToSaved(String zip) {
         if (!(zip.length() == 5)) {
@@ -197,12 +216,17 @@ public class Fetcher {
         }
     }
 
-    public Report[] getWeatherReports(String[] zips) {
-        // for saved locations
-        Report[] reports = new Report[zips.length];
+    /**
+     * Get weather reports in bulk
+     *
+     * @param zips list of ZIP codes/locations to pull from
+     * @return Report[] array of reports
+     */
+    public ArrayList<Report> getWeatherReports(ArrayList<String> zips) {
+        ArrayList<Report> reports = new ArrayList<>();
 
-        for (int i = 0; i < zips.length; i++) {
-            reports[i] = getWeatherReport(zips[i]);
+        for (int i = 0; i < zips.size(); i++) {
+            reports.set(i, getWeatherReport(zips.get(i)));
         }
 
         return reports;

@@ -1,7 +1,6 @@
 package org.nothing.jocularweather;
 
 import javafx.application.Application;
-import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
@@ -17,6 +16,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.text.DateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
@@ -43,24 +43,26 @@ public class Main extends Application {
     private final Fetcher fetcher = new Fetcher();
 
     /**
-     * @param str
-     * @return
+     * Returns whether a string is only numbers
+     *
+     * @param str any string
+     * @return boolean whether the string is only digits
      */
     public static boolean isNumeric(String str) {
         try {
-            double d = Double.parseDouble(str);
-            System.out.println(d);
+            Double.parseDouble(str);
+            return true;
         } catch (NumberFormatException e) {
             return false;
         }
-
-        return true;
     }
 
     /**
-     * @param unixTime
-     * @param timeZone
-     * @return
+     * Returns formatted time from unix timestamp
+     *
+     * @param unixTime time at location in seconds after Unix epoch
+     * @param timeZone time zone offset in seconds from UTC
+     * @return String formatted value
      */
     public static String getHourlyTime(long unixTime, long timeZone) {
         Date myDate = new Date(unixTime * 1000);
@@ -76,7 +78,9 @@ public class Main extends Application {
     }
 
     /**
-     * @return
+     * Returns random weather joke
+     *
+     * @return String a weather joke
      */
     public String getWeatherJoke() {
         String origStr = "No joke";
@@ -113,8 +117,8 @@ public class Main extends Application {
         // locationLabel.setText(String.format("%s, %s", report.name(),
         // report.sys.country()));
 
-        String[] savedLocations = Fetcher.getSavedLocations();
-        Report[] savedLocationReports = fetcher.getWeatherReports(savedLocations);
+        ArrayList<String> savedLocations = Fetcher.getSavedLocations();
+        ArrayList<Report> savedLocationReports = fetcher.getWeatherReports(savedLocations);
 
         for (Report savedLocationReport : savedLocationReports) {
             System.out.println(savedLocationReport);
