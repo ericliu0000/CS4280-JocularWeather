@@ -17,6 +17,7 @@ import javafx.stage.Stage;
 
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
@@ -26,7 +27,9 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.text.DateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
+import java.util.Locale;
 
 public class Main extends Application {
     private static final String API_KEY = getEnv("API_KEY");
@@ -51,6 +54,11 @@ public class Main extends Application {
     private static final AnchorPane leftPane = new AnchorPane();
     private static final VBox rightPane = new VBox();
 
+    /**
+     * 
+     * @param key
+     * @return
+     */
     public static String getEnv(String key) {
         ArrayList<String> constants;
 
@@ -71,6 +79,12 @@ public class Main extends Application {
         return "";
     }
 
+    /**
+     * 
+     * @param zipCode
+     * @param units
+     * @return
+     */
     public static String getWeatherReport(String zipCode, String units) {
         String combinedURL = BASE_URL + "?appid=" + API_KEY + "&zip=" + zipCode + "&units=" + units;
 
@@ -104,6 +118,11 @@ public class Main extends Application {
         return null;
     }
 
+    /**
+     * 
+     * @param str
+     * @return
+     */
     public static boolean isNumeric(String str) {
         try {
             double d = Double.parseDouble(str);
@@ -115,12 +134,22 @@ public class Main extends Application {
         return true;
     }
 
+    /**
+     * 
+     * @param str
+     * @return
+     */
     public static boolean isZipCode(String str) {
         return str.length() == 5 && isNumeric(str);
     }
 
-    public static boolean pushToDB(String zipCode) {
-        String useURL = "https://98q0kalf91.execute-api.us-east-1.amazonaws.com/?zip=" + zipCode;
+    /**
+     * 
+     * @param zipCode
+     * @return
+     */
+    public static boolean pushToDB(String zipCode, double lon, double lat) {
+        String useURL = "https://98q0kalf91.execute-api.us-east-1.amazonaws.com/pushdb?zip=" + zipCode + "&lon=" + lon + "&lat=" + lat;
 
         try {
             HttpURLConnection connection = (HttpURLConnection) new URI(useURL).toURL().openConnection();
@@ -144,14 +173,17 @@ public class Main extends Application {
 
     }
 
+    /**
+     * 
+     * @return
+     */
     public String getWeatherJoke() {
-        // random shrek quote
-        String origStr = null;
+        String origStr = "No joke";
+
         try {
             origStr = Files.readString(Paths.get("src/main/resources/weather-jokes.txt"));
         } catch (IOException e) {
-            System.out.println(e);
-            System.exit(0);
+            e.printStackTrace();
         }
 
         String[] lines = origStr.split("\n");
@@ -159,9 +191,18 @@ public class Main extends Application {
         return lines[selection];
     }
 
+    /**
+     * 
+     * @param unixTime
+     * @param timeZone
+     * @return
+     */
     public static String getHourlyTime(long unixTime, long timeZone) {
         Date myDate = new Date(unixTime * 1000);
-        DateFormat format = DateFormat.getDateInstance(DateFormat.SHORT);
+        Calendar time = Calendar.getInstance();
+        time.setTime(myDate);
+        // time.setTime;
+        DateFormat format = DateFormat.getTimeInstance(DateFormat.SHORT, Locale.UK);
         String dateString = format.format(myDate);
 
         return dateString;
@@ -208,7 +249,8 @@ public class Main extends Application {
 
         try {
             processedReport = mapper.readValue(report, Report.class);
-            pushToDB(zip);
+
+            pushToDB(zip, processedReport.coord().lon(), processedReport.coord().lat());
         } catch (JsonProcessingException e) {
             throw new RuntimeException("THE REPORT IS NOT SET UP CORRECTLY!");
         }
@@ -230,7 +272,16 @@ public class Main extends Application {
         return lines;
     }
 
+    /**
+     * 
+     * @param zip
+     * @return
+     */
     public boolean removeZipFromSaved(String zip) {
+          if (!(zip.length() == 5)) {
+            return false; // the zipcode length must be 5
+        }
+
         String[] zips = getSavedLocations();
         String newZips = "";
 
@@ -250,24 +301,33 @@ public class Main extends Application {
         return true;
     }
 
+    /**
+     * 
+     * @param zip
+     * @return
+     */
     public boolean addZipToSaved(String zip) {
-        String[] zips = getSavedLocations();
-        String newZips = "";
-
-        for (String z : zips) {
-            newZips += z + "\n";
+        if (!(zip.length() == 5)) {
+            return false; // the zipcode length must be 5
         }
 
-        newZips += zip + "\n";
+        // String[] zips = getSavedLocations();
+        // String newZips = String.join("\n", zips);
 
-        try {
-            Files.writeString(Paths.get("src/main/resources/locationStorage.txt"), newZips);
+        // // for (String z : zips) {
+        // //     newZips += z + "\n";
+        // // }
+
+        // newZips += zip + "\n";
+
+        try (FileWriter writer = new FileWriter("src/main/resources/locationStorage.txt")) {
+            // Files.writeString(Paths.get("src/main/resources/locationStorage.txt"), newZips);
+            writer.append(zip);
+            return true;
         } catch (IOException e) {
-            System.out.println(e);
+            e.printStackTrace();
             return false;
         }
-
-        return true;
     }
 
     public Report[] getWeatherReports(String[] zips) {
@@ -285,12 +345,9 @@ public class Main extends Application {
         double feelsLike = report.main().feels_like();
         double temp = report.main().temp();
         String conditions = report.weather().get(0).main();
-        // String icon = report.weather().get(0).icon();
         long timeZone = report.timezone();
         String sunriseTime = getHourlyTime(report.sys().sunrise(), timeZone);
         String sunsetTime = getHourlyTime(report.sys().sunset(), timeZone);
-        // String country = report.sys().country();
-        // String city = report.name();
 
         feelsLikeBox.setContentText(String.valueOf(feelsLike));
         tempBox.setContentText(String.valueOf(temp));
@@ -306,6 +363,13 @@ public class Main extends Application {
         // formatReport(report);
         // locationLabel.setText(String.format("%s, %s", report.name(),
         // report.sys.country()));
+
+        String[] savedLocations = getSavedLocations();
+        Report[] savedLocationReports = getWeatherReports(savedLocations);
+
+        for (int i=0; i<savedLocationReports.length; i++) {
+            System.out.println(savedLocationReports[i]);
+        }
 
         Report r = getWeatherReport(getCurrentCity());
         formatReport(r);

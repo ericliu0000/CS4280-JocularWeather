@@ -1,5 +1,5 @@
 # CS4280-JocularWeather
-
+*Eric Liu, Ganning Xu*
 ## Data Storage
 
 We created an AWS Lambda function that can receive a zip code and store it in a Supabase table. This serverless architecture allows us to also extract the IP address and location of the incoming request.
@@ -7,7 +7,12 @@ We created an AWS Lambda function that can receive a zip code and store it in a 
 This serverless function was written in `node.js` using the Serverless framework, which makes deploying to AWS easier.
 
 Documentation:
-`POST` `<https://98q0kalf91.execute-api.us-east-1.amazonaws.com?zip=five_digit_zip_code>`
+`GET` `https://98q0kalf91.execute-api.us-east-1.amazonaws.com/pushdb?zip=<zip>&lon=<longitude>&lat=<latitude>`
+- Making a `GET` request to this URL will push the zipcode, longitude, and latitude, all to Supabase.
+
+`GET` `https://98q0kalf91.execute-api.us-east-1.amazonaws.com/ip`
+- Making a `GET` request to this URL will return the city that's associated with the source IP address
+
 
 The Lambda function code can be found below:
 ```js
@@ -15,19 +20,22 @@ const { createClient } = require("@supabase/supabase-js");
 const fetch = require("node-fetch");
 require("dotenv").config();
 
-const supabaseUrl = process.env.SUPABSE_URL;
+// Get Supabase URL and API key from environment variables
+const supabaseUrl = process.env.PROJECT_URL;
 const supabaseKey = process.env.SUPABASE_KEY;
+
+// Create Supabase client instance
 const supabase = createClient(supabaseUrl, supabaseKey);
 
+// Define AWS Lambda handler function
 module.exports.handler = async (event) => {
+  // Retrieve zip code, longitude, and latitude from query parameters
   const zipCode = event.queryStringParameters.zip;
+  const lon = event.queryStringParameters.lon;
+  const lat = event.queryStringParameters.lat;
 
-  if (
-    zipCode === undefined ||
-    zipCode === null ||
-    zipCode === "" ||
-    zipCode.length !== 5
-  ) {
+  // Check if zip code is valid
+  if (zipCode === undefined || zipCode === null || zipCode === "") {
     return {
       statusCode: 400,
       body: JSON.stringify({
@@ -41,10 +49,12 @@ module.exports.handler = async (event) => {
   let loc = null;
 
   try {
+    // Retrieve user's IP address and location information using an external API
     sourceIp = event.requestContext?.http.sourceIp;
     loc = await getLocFromIP(sourceIp);
     userAgent = event.requestContext?.http.userAgent;
   } catch (error) {
+    // Return error response if location information cannot be retrieved
     return {
       statusCode: 500,
       body: JSON.stringify({
@@ -53,6 +63,7 @@ module.exports.handler = async (event) => {
     };
   }
 
+  // Insert new record into Supabase database table
   const { data, error } = await supabase.from("zips").insert({
     zip: zipCode,
     sourceIp: sourceIp,
@@ -60,12 +71,16 @@ module.exports.handler = async (event) => {
     country: loc?.country,
     city: loc?.city,
     regionName: loc?.regionName,
+    lon: lon,
+    lat: lat,
   });
 
+  // Log any errors that occur during the database insert operation
   if (error) {
     console.log(error);
   }
 
+  // Return success response with inserted record data and original event information
   return {
     statusCode: 200,
     body: JSON.stringify({
@@ -75,6 +90,7 @@ module.exports.handler = async (event) => {
   };
 };
 
+// Helper function to retrieve location information from IP address
 async function getLocFromIP(ip) {
   const ENDPOINT = `http://ip-api.com/json/${ip}`;
 
