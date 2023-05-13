@@ -1,6 +1,7 @@
 package org.nothing.jocularweather;
 
 import javafx.application.Application;
+import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
@@ -24,11 +25,11 @@ public class Main extends Application {
     private static final Button searchButton = new Button("Search");
     private static final HBox searchGroup = new HBox(searchField, searchButton);
     private static final Label locationLabel = new Label("");
-    private static final InfoBox feelsLikeBox = new InfoBox("feels like", "");
-    private static final InfoBox tempBox = new InfoBox("temperature like", "");
-    private static final InfoBox conditionsBox = new InfoBox("conditions like", "");
-    private static final InfoBox sunriseBox = new InfoBox("sunrise like", "");
-    private static final InfoBox sunsetBox = new InfoBox("sunset like", "");
+    private static final InfoBox feelsLikeBox = new InfoBox("Feels like", "");
+    private static final InfoBox tempBox = new InfoBox("Current temperature", "");
+    private static final InfoBox conditionsBox = new InfoBox("Conditions", "");
+    private static final InfoBox sunriseBox = new InfoBox("Sunrise", "");
+    private static final InfoBox sunsetBox = new InfoBox("Sunset", "");
     private static final FlowPane contentGroup = new FlowPane(feelsLikeBox, tempBox, conditionsBox, sunriseBox, sunsetBox);
     private static final VBox contentBox = new VBox(locationLabel, contentGroup);
     private static final Button jokeButton = new Button("Get Joke");
@@ -81,9 +82,9 @@ public class Main extends Application {
      * @param report Populated weather report
      */
     public void formatReport(Report report) {
+        // Pull required fields from weather report
         String cityName = report.name();
         String country = report.sys().country();
-
         double feelsLike = report.main().feels_like();
         double temp = report.main().temp();
         long timeZone = report.timezone();
@@ -102,18 +103,17 @@ public class Main extends Application {
 
     @Override
     public void start(Stage stage) {
-        // Pull saved locations from database
+        // Pull saved locations from database and get current report
         ArrayList<String> savedLocations = Fetcher.getSavedLocations();
         ArrayList<Report> savedLocationReports = fetcher.getWeatherReports(savedLocations);
+        formatReport(fetcher.getWeatherReport(fetcher.getCurrentCity()));
 
         // Testing: print out reports
         for (Report savedLocationReport : savedLocationReports) {
             System.out.println(savedLocationReport);
         }
 
-        // Collect current report
-        formatReport(fetcher.getWeatherReport(fetcher.getCurrentCity()));
-
+        // Configure prompts
         searchField.setPromptText("Enter location...");
         searchField.setOnAction((e) -> formatReport(fetcher.getWeatherReport(searchField.getText())));
         searchButton.setOnAction((e) -> formatReport(fetcher.getWeatherReport(searchField.getText())));
@@ -123,7 +123,7 @@ public class Main extends Application {
         searchGroup.setSpacing(20);
         contentGroup.setPrefWidth(400);
         contentGroup.setHgap(20);
-        contentGroup.setVgap(20);
+        contentGroup.setPadding(new Insets(20));
         rightPane.setSpacing(10);
 
         // Align everything in right pane and push together

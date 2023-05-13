@@ -13,6 +13,7 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 
 public class Fetcher {
+    public static final String CITY_URL = "https://98q0kalf91.execute-api.us-east-1.amazonaws.com/ip";
     private static final String API_KEY = getEnv("API_KEY");
     private static final String BASE_URL = getEnv("BASE_URL");
 
@@ -102,9 +103,8 @@ public class Fetcher {
      * @return String city, blank if not found
      */
     public String getCurrentCity() {
-        String cityURL = "https://98q0kalf91.execute-api.us-east-1.amazonaws.com/ip";
         try {
-            HttpURLConnection connection = (HttpURLConnection) new URI(cityURL).toURL().openConnection();
+            HttpURLConnection connection = (HttpURLConnection) new URI(CITY_URL).toURL().openConnection();
             connection.setRequestMethod("GET");
             BufferedReader in = new BufferedReader(new InputStreamReader(connection.getInputStream()));
 
@@ -117,7 +117,6 @@ public class Fetcher {
             in.close();
 
             return content.toString();
-
         } catch (Exception e) {
             e.printStackTrace();
             return "";

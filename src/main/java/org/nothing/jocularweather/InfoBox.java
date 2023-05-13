@@ -21,7 +21,9 @@ public class InfoBox extends VBox {
         contentLabel = new Label(body);
 
         this.setAlignment(Pos.CENTER);
-        this.setPadding(new Insets(10, 10, 10, 10));
+        this.setSpacing(5);
+        this.setPadding(new Insets(10));
+        this.setPrefWidth(200);
 
         this.getChildren().addAll(headerLabel, contentLabel);
         this.getChildren().addAll(children);
