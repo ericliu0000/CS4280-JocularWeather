@@ -15,11 +15,7 @@ import javafx.stage.Stage;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.text.DateFormat;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.Locale;
+import java.util.*;
 
 public class Main extends Application {
 
@@ -43,34 +39,21 @@ public class Main extends Application {
     private final Fetcher fetcher = new Fetcher();
 
     /**
-     * Returns whether a string is only numbers
-     *
-     * @param str any string
-     * @return boolean whether the string is only digits
-     */
-    public static boolean isNumeric(String str) {
-        try {
-            Double.parseDouble(str);
-            return true;
-        } catch (NumberFormatException e) {
-            return false;
-        }
-    }
-
-    /**
-     * Returns formatted time from unix timestamp
+     * Returns formatted time from Unix timestamp
      *
      * @param unixTime time at location in seconds after Unix epoch
      * @param timeZone time zone offset in seconds from UTC
-     * @return String formatted value
+     * @return String formatted value in hh:mm AM/PM
      */
     public static String getHourlyTime(long unixTime, long timeZone) {
         Date myDate = new Date(unixTime * 1000);
-        Calendar time = Calendar.getInstance();
-        time.setTime(myDate);
-        DateFormat format = DateFormat.getTimeInstance(DateFormat.SHORT, Locale.UK);
+        Calendar time = Calendar.getInstance(Locale.UK);
 
-        return format.format(myDate);
+        // Fix time zone to API output
+        time.setTimeZone(new SimpleTimeZone((int) (timeZone * 1000), ""));
+        time.setTime(myDate);
+
+        return String.format("%s:%s %s", time.get(Calendar.HOUR), time.get(Calendar.MINUTE), (time.get(Calendar.AM_PM) == Calendar.AM ? "AM" : "PM"));
     }
 
     public static void main(String[] args) {
@@ -80,27 +63,31 @@ public class Main extends Application {
     /**
      * Returns random weather joke
      *
-     * @return String a weather joke
+     * @return String containing pure humor
      */
     public String getWeatherJoke() {
-        String origStr = "No joke";
-
         try {
-            origStr = Files.readString(Paths.get("src/main/resources/weather-jokes.txt"));
+            List<String> jokes = Files.readAllLines(Paths.get("src/main/resources/weather-jokes.txt"));
+            return jokes.get((int) (Math.random() * jokes.size()));
         } catch (IOException e) {
             e.printStackTrace();
+            return "No joke available :(";
         }
-
-        String[] lines = origStr.split("\n");
-        int selection = (int) (Math.random() * lines.length);
-        return lines[selection];
     }
 
+    /**
+     * Formats weather report elements in main frame given Report object.
+     *
+     * @param report Populated weather report
+     */
     public void formatReport(Report report) {
+        String cityName = report.name();
+        String country = report.sys().country();
+
         double feelsLike = report.main().feels_like();
         double temp = report.main().temp();
-        String conditions = report.weather().get(0).main();
         long timeZone = report.timezone();
+        String conditions = report.weather().get(0).main();
         String sunriseTime = getHourlyTime(report.sys().sunrise(), timeZone);
         String sunsetTime = getHourlyTime(report.sys().sunset(), timeZone);
 
@@ -109,52 +96,45 @@ public class Main extends Application {
         conditionsBox.setContentText(conditions);
         sunriseBox.setContentText(sunriseTime);
         sunsetBox.setContentText(sunsetTime);
+
+        locationLabel.setText(String.format("Current Location: %s, %s", cityName, country));
     }
 
     @Override
     public void start(Stage stage) {
-        // formatReport(report);
-        // locationLabel.setText(String.format("%s, %s", report.name(),
-        // report.sys.country()));
-
+        // Pull saved locations from database
         ArrayList<String> savedLocations = Fetcher.getSavedLocations();
         ArrayList<Report> savedLocationReports = fetcher.getWeatherReports(savedLocations);
 
+        // Testing: print out reports
         for (Report savedLocationReport : savedLocationReports) {
             System.out.println(savedLocationReport);
         }
 
-        Report r = fetcher.getWeatherReport(fetcher.getCurrentCity());
-        formatReport(r);
+        // Collect current report
+        formatReport(fetcher.getWeatherReport(fetcher.getCurrentCity()));
 
-        locationLabel.setText(String.format("Current Location: %s,%s", r.name(), r.sys().country()));
-
-        searchField.setPromptText("Enter ZIP Code...");
-        searchButton.setOnAction((e) -> {
-            Report report = fetcher.getWeatherReport(searchField.getText());
-
-            formatReport(report);
-            locationLabel.setText(String.format("%s, %s", report.name(), report.sys().country()));
-        });
-        searchGroup.setAlignment(Pos.CENTER);
-
-        contentGroup.setPrefWidth(400);
-        contentGroup.setAlignment(Pos.CENTER);
-        contentGroup.setHgap(20);
-        contentGroup.setVgap(20);
-
-        contentBox.setAlignment(Pos.CENTER);
-
+        searchField.setPromptText("Enter location...");
+        searchField.setOnAction((e) -> formatReport(fetcher.getWeatherReport(searchField.getText())));
+        searchButton.setOnAction((e) -> formatReport(fetcher.getWeatherReport(searchField.getText())));
         jokeButton.setOnAction((e) -> jokeLabel.setText(getWeatherJoke()));
 
-        jokeGroup.setAlignment(Pos.CENTER);
+        // Adjust spacing for everything
+        searchGroup.setSpacing(20);
+        contentGroup.setPrefWidth(400);
+        contentGroup.setHgap(20);
+        contentGroup.setVgap(20);
+        rightPane.setSpacing(10);
 
+        // Align everything in right pane and push together
+        searchGroup.setAlignment(Pos.CENTER);
+        contentGroup.setAlignment(Pos.CENTER);
+        contentBox.setAlignment(Pos.CENTER);
+        jokeGroup.setAlignment(Pos.CENTER);
         rightPane.setAlignment(Pos.CENTER);
         rightPane.getChildren().addAll(titleLabel, searchGroup, locationLabel, contentBox, jokeGroup);
 
-        System.out.println(fetcher.getCurrentCity());
-
-        var scene = new Scene(rightPane, 640, 480);
+        Scene scene = new Scene(rightPane, 640, 480);
         scene.getStylesheets().add("style.css");
 
         stage.setScene(scene);

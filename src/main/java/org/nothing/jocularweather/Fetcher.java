@@ -82,6 +82,21 @@ public class Fetcher {
     }
 
     /**
+     * Returns whether a string is only numbers
+     *
+     * @param str any string
+     * @return boolean whether the string is only digits
+     */
+    public static boolean isNumeric(String str) {
+        try {
+            Double.parseDouble(str);
+            return true;
+        } catch (NumberFormatException e) {
+            return false;
+        }
+    }
+
+    /**
      * Pull current city from user IP
      *
      * @return String city, blank if not found
@@ -120,7 +135,7 @@ public class Fetcher {
         StringBuilder content = new StringBuilder();
         String combinedURL = BASE_URL + "?appid=" + API_KEY + "&zip=" + zipCode + "&units=imperial";
 
-        if (!Main.isNumeric(zipCode)) {
+        if (!isNumeric(zipCode)) {
             combinedURL = BASE_URL + "?appid=" + API_KEY + "&q=" + zipCode + "&units=imperial";
         }
 
@@ -194,20 +209,10 @@ public class Fetcher {
      */
     public boolean addZipToSaved(String zip) {
         if (!(zip.length() == 5)) {
-            return false; // the zipcode length must be 5
+            return false;
         }
 
-        // String[] zips = getSavedLocations();
-        // String newZips = String.join("\n", zips);
-
-        // // for (String z : zips) {
-        // //     newZips += z + "\n";
-        // // }
-
-        // newZips += zip + "\n";
-
         try (FileWriter writer = new FileWriter("src/main/resources/locationStorage.txt")) {
-            // Files.writeString(Paths.get("src/main/resources/locationStorage.txt"), newZips);
             writer.append(zip);
             return true;
         } catch (IOException e) {
@@ -225,8 +230,8 @@ public class Fetcher {
     public ArrayList<Report> getWeatherReports(ArrayList<String> zips) {
         ArrayList<Report> reports = new ArrayList<>();
 
-        for (int i = 0; i < zips.size(); i++) {
-            reports.set(i, getWeatherReport(zips.get(i)));
+        for (String zip : zips) {
+            reports.add(getWeatherReport(zip));
         }
 
         return reports;
