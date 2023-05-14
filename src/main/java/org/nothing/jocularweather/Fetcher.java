@@ -14,13 +14,16 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.TreeMap;
 
+/**
+ * Class for getting and putting information to weather, storage, and location APIs.
+ *
+ * @author Ganning Xu
+ * @author Eric Liu
+ */
 public class Fetcher {
-    public static final String CITY_URL = "https://98q0kalf91.execute-api.us-east-1.amazonaws.com/ip";
+    private static final String CITY_URL = "https://98q0kalf91.execute-api.us-east-1.amazonaws.com/ip";
     private static final String API_KEY = getEnv("API_KEY");
     private static final String BASE_URL = getEnv("BASE_URL");
-
-    public Fetcher() {
-    }
 
     /**
      * Returns environment variable with desired key

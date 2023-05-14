@@ -1,9 +1,27 @@
 package org.nothing.jocularweather;
 
+/**
+ * Helper class to log program operation information.
+ *
+ * @author Ganning Xu
+ * @author Eric Liu
+ */
 public class Logger {
+    /**
+     * Character to set text color to default color.
+     */
     public static final String ANSI_RESET = "\u001B[0m";
+    /**
+     * Character to set text color to red.
+     */
     public static final String ANSI_RED = "\u001B[31m";
+    /**
+     * Character to set text color to green.
+     */
     public static final String ANSI_GREEN = "\u001B[32m";
+    /**
+     * Character to set text color to yellow.
+     */
     public static final String ANSI_YELLOW = "\u001B[33m";
 
     /**

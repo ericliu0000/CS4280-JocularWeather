@@ -8,6 +8,12 @@ import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 
+/**
+ * Object containing elements to house weather report information. Includes option to add icon to contents.
+ *
+ * @author Eric Liu
+ * @author Ganning Xu
+ */
 public class InfoBox extends VBox {
     private final Label contentLabel;
     private final HBox contentGroup = new HBox();

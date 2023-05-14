@@ -8,6 +8,12 @@ import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
 
+/**
+ * Object containing elements that display current weather information of saved weather locations.
+ *
+ * @author Eric Liu
+ * @author Ganning Xu
+ */
 public class LocationBox extends HBox {
     private final Label conditionLabel = new Label("Not available");
     private final Label temperatureLabel = new Label("nn");
@@ -16,7 +22,7 @@ public class LocationBox extends HBox {
 
     /**
      * Creates new location box.
-     * 
+     *
      * @param locationName name of city
      * @param zip          zip code of city
      */
@@ -41,7 +47,7 @@ public class LocationBox extends HBox {
 
     /**
      * Sets text field of condition box.
-     * 
+     *
      * @param text qualitative weather at site
      */
     public void setCondition(String text) {
@@ -50,7 +56,7 @@ public class LocationBox extends HBox {
 
     /**
      * Sets temperature field of location box.
-     * 
+     *
      * @param temp numeric temperature value
      */
     public void setTemperature(long temp) {
@@ -59,7 +65,7 @@ public class LocationBox extends HBox {
 
     /**
      * Returns zip code of city
-     * 
+     *
      * @return String zip code
      */
     public String getZip() {

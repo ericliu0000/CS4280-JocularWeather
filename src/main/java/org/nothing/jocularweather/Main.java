@@ -19,6 +19,12 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.*;
 
+/**
+ * Main class for JocularWeather application.
+ *
+ * @author Eric Liu
+ * @author Ganning Xu
+ */
 public class Main extends Application {
 
     private static final Label titleLabel = new Label("JocularWeather.jar.EXE");
@@ -62,6 +68,10 @@ public class Main extends Application {
         return String.format("%d:%02d %s", time.get(Calendar.HOUR), time.get(Calendar.MINUTE), (time.get(Calendar.AM_PM) == Calendar.AM ? "AM" : "PM"));
     }
 
+    /**
+     * Runs program
+     * @param args Command line arguments; unused
+     */
     public static void main(String[] args) {
         launch();
     }

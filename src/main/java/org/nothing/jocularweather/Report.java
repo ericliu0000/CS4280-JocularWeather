@@ -4,7 +4,7 @@ import java.util.List;
 
 /**
  * Parent class for JSON object from weather report. Follows
- * {@link <a href="https://openweathermap.org/current#current_JSON">docs</a>}
+ * <a href="https://openweathermap.org/current#current_JSON">...</a>
  *
  * @param coord      location of station
  * @param weather    qualitative overview of weather
