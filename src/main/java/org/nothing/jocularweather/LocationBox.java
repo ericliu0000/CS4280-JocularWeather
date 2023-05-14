@@ -39,7 +39,8 @@ public class LocationBox extends HBox {
         Region centerBuffer = new Region();
         HBox.setHgrow(centerBuffer, Priority.ALWAYS);
 
-        this.setPrefWidth(150);
+        this.setPrefWidth(250);
+        this.setMinWidth(200);
         this.setAlignment(Pos.CENTER_LEFT);
         this.setPadding(new Insets(10));
         this.getChildren().addAll(leftGroup, centerBuffer, temperatureLabel);
@@ -59,8 +60,8 @@ public class LocationBox extends HBox {
      *
      * @param temp numeric temperature value
      */
-    public void setTemperature(long temp) {
-        temperatureLabel.setText(String.format("%s °F", temp));
+    public void setTemperature(String temp) {
+        temperatureLabel.setText(temp);
     }
 
     /**

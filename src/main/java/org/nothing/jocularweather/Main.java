@@ -32,13 +32,16 @@ public class Main extends Application {
     private static final Button searchButton = new Button("Search");
     private static final HBox searchGroup = new HBox(searchField, searchButton);
     private static final Label locationLabel = new Label("");
-    private static final Image conditionsIcon = new Image(String.valueOf(Main.class.getResource("/icons/01d.png")), 30, 30, false, false);
+    private static final Image conditionsIcon = new Image(String.valueOf(Main.class.getResource("/icons/01d.png")), 20, 20, false, false);
     private static final InfoBox feelsLikeBox = new InfoBox("Feels like", "");
     private static final InfoBox tempBox = new InfoBox("Current temperature", "");
     private static final InfoBox conditionsBox = new InfoBox("Conditions", "", conditionsIcon);
+    private static final InfoBox humidityBox = new InfoBox("Humidity", "");
+    private static final InfoBox pressureBox = new InfoBox("Sea level pressure", "");
+    private static final InfoBox windBox = new InfoBox("Wind", "");
     private static final InfoBox sunriseBox = new InfoBox("Sunrise", "");
     private static final InfoBox sunsetBox = new InfoBox("Sunset", "");
-    private static final FlowPane contentGroup = new FlowPane(feelsLikeBox, tempBox, conditionsBox, sunriseBox, sunsetBox);
+    private static final FlowPane contentGroup = new FlowPane(feelsLikeBox, tempBox, conditionsBox, humidityBox, pressureBox, windBox, sunriseBox, sunsetBox);
     private static final VBox contentBox = new VBox(locationLabel, contentGroup);
     private static final Button jokeButton = new Button("Get Joke");
     private static final Label jokeLabel = new Label();
@@ -106,20 +109,27 @@ public class Main extends Application {
         long timeZone = report.timezone();
         String conditions = report.weather().get(0).main();
         String icon = report.weather().get(0).icon();
+        int humidity = report.main().humidity();
+        int pressure = report.main().pressure();
+        int windDirection = report.wind().deg();
+        double windSpeed = report.wind().gust();
         String sunriseTime = getHourlyTime(report.sys().sunrise(), timeZone);
         String sunsetTime = getHourlyTime(report.sys().sunset(), timeZone);
 
-        feelsLikeBox.setContentText(String.valueOf(feelsLike));
-        tempBox.setContentText(String.valueOf(temp));
+        feelsLikeBox.setContentText(String.format("%s °F", feelsLike));
+        tempBox.setContentText(String.format("%s °F", temp));
         conditionsBox.setContentText(conditions);
+        humidityBox.setContentText(String.format("%d%%", humidity));
+        pressureBox.setContentText(String.format("%d hPa", pressure));
+        windBox.setContentText(String.format("%03d°/%.02f mph", windDirection, windSpeed));
         sunriseBox.setContentText(sunriseTime);
         sunsetBox.setContentText(sunsetTime);
 
+        // Set condition icon
         try {
-            // Set condition icon
-            conditionsBox.getIcon().setImage(new Image(Objects.requireNonNull(Main.class.getResource(String.format("/icons/%s.png", icon))).openStream(), 30, 30, false, false));
+            conditionsBox.getIcon().setImage(new Image(Objects.requireNonNull(Main.class.getResource(String.format("/icons/%s.png", icon))).openStream(), 20, 20, false, false));
         } catch (IOException e) {
-            Logger.print(MessageType.JW_ERROR, "Could not resolve icon");
+            Logger.print(MessageType.JW_ERROR, "Could not find icon");
             e.printStackTrace();
         }
 
@@ -128,29 +138,29 @@ public class Main extends Application {
 
     @Override
     public void start(Stage stage) {
-        Logger.print(MessageType.JW_INFO, "Starting JocularWeather.jar.EXE");
         // Pull saved locations from database and get current report
+        Logger.print(MessageType.JW_INFO, "Starting JocularWeather.jar.EXE");
         ArrayList<String> savedLocations = Fetcher.getSavedLocations();
         ArrayList<LocationBox> savedLocationBoxes = new ArrayList<>();
 
         Logger.print(MessageType.JW_INFO, "Requesting weather reports for saved locations");
 
+        // Map ZIP code and weather report objects together
         TreeMap<String, Report> savedLocationReports = fetcher.getWeatherReports(savedLocations);
         formatReport(fetcher.getWeatherReport(fetcher.getCurrentCity()));
 
-        // Testing: print out reports
         Logger.print(MessageType.JW_INFO, "Rendering saved locations");
         for (Map.Entry<String, Report> entry : savedLocationReports.entrySet()) {
             Report report = entry.getValue();
             Logger.print(MessageType.JW_INFO, report.toString());
 
+            // Update location boxes in sidebar
             LocationBox box = new LocationBox(String.format("%s, %s", report.name(), report.sys().country()), entry.getKey());
             box.setCondition(report.weather().get(0).main());
-            box.setTemperature(Math.round(report.main().temp()));
+            box.setTemperature(String.format("%s °F", report.main().temp()));
 
-            // Set updater for clicking on it
+            // Set updater for box
             box.setOnMouseClicked((e) -> formatReport(fetcher.getWeatherReport(box.getZip())));
-
             savedLocationBoxes.add(box);
         }
 
@@ -168,6 +178,7 @@ public class Main extends Application {
         contentGroup.setPrefWidth(600);
         contentGroup.setHgap(20);
         contentGroup.setPadding(new Insets(10));
+        leftPane.setSpacing(10);
         rightPane.setSpacing(10);
 
         // Align everything in right pane and push together
@@ -175,9 +186,11 @@ public class Main extends Application {
         contentGroup.setAlignment(Pos.CENTER);
         contentBox.setAlignment(Pos.CENTER);
         jokeGroup.setAlignment(Pos.CENTER);
+        leftPane.setAlignment(Pos.TOP_LEFT);
         rightPane.setAlignment(Pos.CENTER);
 
         // TODO add zip add search bar
+        // TODO add a line between the two
         leftPane.getChildren().addAll(savedLocationBoxes);
         rightPane.getChildren().addAll(titleLabel, searchGroup, locationLabel, contentBox, jokeGroup);
 
@@ -185,7 +198,7 @@ public class Main extends Application {
         HBox allContent = new HBox(leftPane, rightPane);
         HBox.setHgrow(allContent, Priority.ALWAYS);
 
-        Scene scene = new Scene(allContent, 640, 480);
+        Scene scene = new Scene(allContent, 680, 480);
         scene.getStylesheets().add("style.css");
 
         // set the stage and scene, and show the stage
