@@ -23,6 +23,7 @@ import java.util.List;
 public record Report(Coordinates coord, List<Weather> weather, String base, Details main, int visibility, Wind wind,
                      Clouds clouds, Rain rain, Snow snow, int dt, WxSystem sys, int timezone, int id, String name,
                      int cod) {
+
     @Override
     public String toString() {
         return String.format("Weather report for %s", name);

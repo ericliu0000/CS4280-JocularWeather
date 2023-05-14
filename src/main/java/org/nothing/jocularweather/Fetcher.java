@@ -7,6 +7,7 @@ import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -83,10 +84,10 @@ public class Fetcher {
     }
 
     /**
-     * Returns whether a string is only numbers
+     * Returns whether a string is not possibly a valid United States ZIP Code
      *
      * @param str any string
-     * @return boolean whether the string is only digits
+     * @return boolean whether the string is only five digits
      */
     public static boolean isNotZip(String str) {
         try {
@@ -130,45 +131,52 @@ public class Fetcher {
      * @return Report object representing unpacked JSON data
      */
     public Report getWeatherReport(String zipCode) {
-        // TODO fix this !
         StringBuilder content = new StringBuilder();
-        String combinedURL = BASE_URL + "?appid=" + API_KEY + "&zip=" + zipCode + "&units=imperial";
+        String combinedURL;
 
         // Search by city if a ZIP code was not added
         if (isNotZip(zipCode)) {
             combinedURL = BASE_URL + "?appid=" + API_KEY + "&q=" + zipCode + "&units=imperial";
+        } else {
+            combinedURL = BASE_URL + "?appid=" + API_KEY + "&zip=" + zipCode + "&units=imperial";
         }
 
+        // Attempt to open connection with API
+        HttpURLConnection connection;
         try {
-            HttpURLConnection connection = (HttpURLConnection) new URI(combinedURL).toURL().openConnection();
+            connection = (HttpURLConnection) new URI(combinedURL).toURL().openConnection();
             connection.setRequestMethod("GET");
+        } catch (IOException | URISyntaxException e) {
+            e.printStackTrace();
+            return null;
+        }
 
-            BufferedReader in = new BufferedReader(new InputStreamReader(connection.getInputStream()));
-
+        // Pull data from API
+        try (BufferedReader in = new BufferedReader(new InputStreamReader(connection.getInputStream()))) {
             String inputLine;
 
             while ((inputLine = in.readLine()) != null) {
                 content.append(inputLine);
             }
-            in.close();
         } catch (Exception e) {
             e.printStackTrace();
+            return null;
         }
 
-        Report processedReport;
-
-        ObjectMapper mapper = new ObjectMapper();
-        mapper.setPropertyNamingStrategy(new PropertyNamingStrategies.SnakeCaseStrategy());
 
         try {
-            processedReport = mapper.readValue(content.toString(), Report.class);
+            // Move JSON into Report record
+            ObjectMapper mapper = new ObjectMapper();
+            mapper.setPropertyNamingStrategy(new PropertyNamingStrategies.SnakeCaseStrategy());
+            Report processedReport = mapper.readValue(content.toString(), Report.class);
 
+            // Load location into database
             pushToDB(zipCode, processedReport.coord().lon(), processedReport.coord().lat());
-        } catch (JsonProcessingException e) {
-            throw new RuntimeException("THE REPORT IS NOT SET UP CORRECTLY!");
-        }
 
-        return processedReport;
+            return processedReport;
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException("Report fields in JSON do not match Report object.");
+        }
     }
 
     /**
