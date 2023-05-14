@@ -55,10 +55,10 @@ public class Fetcher {
      * @param lat     latitude
      */
     public static void pushToDB(String zipCode, double lon, double lat) {
-        String useURL = "https://98q0kalf91.execute-api.us-east-1.amazonaws.com/pushdb?zip=" + zipCode + "&lon=" + lon + "&lat=" + lat;
+        String dbUrl = "https://98q0kalf91.execute-api.us-east-1.amazonaws.com/pushdb?zip=" + zipCode + "&lon=" + lon + "&lat=" + lat;
 
         try {
-            HttpURLConnection connection = (HttpURLConnection) new URI(useURL).toURL().openConnection();
+            HttpURLConnection connection = (HttpURLConnection) new URI(dbUrl).toURL().openConnection();
             connection.setRequestMethod("GET");
             BufferedReader in = new BufferedReader(new InputStreamReader(connection.getInputStream()));
 
@@ -104,11 +104,16 @@ public class Fetcher {
      * @return String city, blank if not found
      */
     public String getCurrentCity() {
+        HttpURLConnection connection;
         try {
-            HttpURLConnection connection = (HttpURLConnection) new URI(CITY_URL).toURL().openConnection();
+            connection = (HttpURLConnection) new URI(CITY_URL).toURL().openConnection();
             connection.setRequestMethod("GET");
-            BufferedReader in = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+        } catch (IOException | URISyntaxException e) {
+            e.printStackTrace();
+            return "";
+        }
 
+        try (BufferedReader in = new BufferedReader(new InputStreamReader(connection.getInputStream()))) {
             String inputLine;
 
             StringBuilder content = new StringBuilder();

@@ -3,10 +3,13 @@ package org.nothing.jocularweather;
 import javafx.application.Application;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
+import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.HBox;
@@ -25,9 +28,10 @@ public class Main extends Application {
     private static final Button searchButton = new Button("Search");
     private static final HBox searchGroup = new HBox(searchField, searchButton);
     private static final Label locationLabel = new Label("");
+    private static final ImageView conditionsIcon = new ImageView(new Image("icons/01n.png"));
     private static final InfoBox feelsLikeBox = new InfoBox("Feels like", "");
     private static final InfoBox tempBox = new InfoBox("Current temperature", "");
-    private static final InfoBox conditionsBox = new InfoBox("Conditions", "");
+    private static final InfoBox conditionsBox = new InfoBox("Conditions", "", conditionsIcon);
     private static final InfoBox sunriseBox = new InfoBox("Sunrise", "");
     private static final InfoBox sunsetBox = new InfoBox("Sunset", "");
     private static final FlowPane contentGroup = new FlowPane(feelsLikeBox, tempBox, conditionsBox, sunriseBox, sunsetBox);
@@ -67,6 +71,7 @@ public class Main extends Application {
      * @return String containing pure humor
      */
     public String getWeatherJoke() {
+        // TODO extract this to Fetcher
         try {
             List<String> jokes = Files.readAllLines(Paths.get("src/main/resources/weather-jokes.txt"));
             return jokes.get((int) (Math.random() * jokes.size()));
