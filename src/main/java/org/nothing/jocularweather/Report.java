@@ -13,6 +13,8 @@ import java.util.List;
  * @param visibility measured visibility in meters, capped at 10km
  * @param wind       wind data at station
  * @param clouds     cloud coverage at station
+ * @param rain       recent rainfall history at station
+ * @param snow       recent snowfall history at station
  * @param dt         current time formatted as Unix timestamp (UTC)
  * @param sys        static positional and solar data of station
  * @param timezone   time correction from UTC in seconds
@@ -22,12 +24,22 @@ import java.util.List;
  */
 public record Report(Coordinates coord, List<Weather> weather, String base, Details main, int visibility, Wind wind,
                      Clouds clouds, Rain rain, Snow snow, int dt, WxSystem sys, int timezone, int id, String name,
-                     int cod) {
+                     int cod) implements ReportBase {
+    private static final ResultType type = ResultType.OKAY;
 
     @Override
     public String toString() {
         return String.format("Weather report for %s", name);
     }
+
+    @Override
+    public ResultType type() {
+        return type;
+    }
+}
+
+record MalformedReport(ResultType type) implements ReportBase {
+
 }
 
 /**

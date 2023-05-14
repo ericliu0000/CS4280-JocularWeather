@@ -15,8 +15,6 @@ import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.util.*;
 
 /**
@@ -57,7 +55,7 @@ public class Main extends Application {
     private final ArrayList<LocationBox> savedLocationBoxes = new ArrayList<>();
 
     /**
-     * Returns formatted time from Unix timestamp
+     * Returns formatted time from Unix timestamp.
      *
      * @param unixTime time at location in seconds after Unix epoch
      * @param timeZone time zone offset in seconds from UTC
@@ -84,60 +82,54 @@ public class Main extends Application {
     }
 
     /**
-     * Returns random weather joke
-     *
-     * @return String containing pure humor
-     */
-    public String getWeatherJoke() {
-        // TODO extract this to Fetcher
-        try {
-            List<String> jokes = Files.readAllLines(Paths.get("src/main/resources/weather-jokes.txt"));
-            return jokes.get((int) (Math.random() * jokes.size()));
-        } catch (IOException e) {
-            e.printStackTrace();
-            return "No joke available :(";
-        }
-    }
-
-    /**
      * Formats weather report elements in main frame given Report object.
      *
      * @param report Populated weather report
      */
-    public void formatReport(Report report) {
-        // Pull required fields from weather report
-        String cityName = report.name();
-        String country = report.sys().country();
-        double feelsLike = report.main().feels_like();
-        double temp = report.main().temp();
-        long timeZone = report.timezone();
-        String conditions = report.weather().get(0).main();
-        String icon = report.weather().get(0).icon();
-        int humidity = report.main().humidity();
-        int pressure = report.main().pressure();
-        int windDirection = report.wind().deg();
-        double windSpeed = report.wind().gust();
-        String sunriseTime = getHourlyTime(report.sys().sunrise(), timeZone);
-        String sunsetTime = getHourlyTime(report.sys().sunset(), timeZone);
+    public void formatReport(ReportBase report) {
+        switch (report.type()) {
+            case OKAY -> {
+                Report weather = (Report) report;
+                // Pull required fields from weather report
+                String cityName = weather.name();
+                String country = weather.sys().country();
+                double feelsLike = weather.main().feels_like();
+                double temp = weather.main().temp();
+                long timeZone = weather.timezone();
+                String conditions = weather.weather().get(0).main();
+                String icon = weather.weather().get(0).icon();
+                int humidity = weather.main().humidity();
+                int pressure = weather.main().pressure();
+                int windDirection = weather.wind().deg();
+                double windSpeed = weather.wind().gust();
+                String sunriseTime = getHourlyTime(weather.sys().sunrise(), timeZone);
+                String sunsetTime = getHourlyTime(weather.sys().sunset(), timeZone);
 
-        feelsLikeBox.setContentText(String.format("%s °F", feelsLike));
-        tempBox.setContentText(String.format("%s °F", temp));
-        conditionsBox.setContentText(conditions);
-        humidityBox.setContentText(String.format("%d%%", humidity));
-        pressureBox.setContentText(String.format("%d hPa", pressure));
-        windBox.setContentText(String.format("%03d°/%.02f mph", windDirection, windSpeed));
-        sunriseBox.setContentText(sunriseTime);
-        sunsetBox.setContentText(sunsetTime);
+                feelsLikeBox.setContentText(String.format("%s °F", feelsLike));
+                tempBox.setContentText(String.format("%s °F", temp));
+                conditionsBox.setContentText(conditions);
+                humidityBox.setContentText(String.format("%d%%", humidity));
+                pressureBox.setContentText(String.format("%d hPa", pressure));
+                windBox.setContentText(String.format("%03d°/%.02f mph", windDirection, windSpeed));
+                sunriseBox.setContentText(sunriseTime);
+                sunsetBox.setContentText(sunsetTime);
 
-        // Set condition icon
-        try {
-            conditionsBox.getIcon().setImage(new Image(Objects.requireNonNull(Main.class.getResource(String.format("/icons/%s.png", icon))).openStream(), 20, 20, false, false));
-        } catch (IOException e) {
-            Logger.print(MessageType.JW_ERROR, "Could not find icon");
-            e.printStackTrace();
+                // Set condition icon
+                try {
+                    conditionsBox.getIcon().setImage(new Image(Objects.requireNonNull(Main.class.getResource(String.format("/icons/%s.png", icon))).openStream(), 20, 20, false, false));
+                } catch (IOException e) {
+                    Logger.print(MessageType.JW_ERROR, "Could not find icon");
+                    e.printStackTrace();
+                }
+
+                locationLabel.setText(String.format("Current Location: %s, %s", cityName, country));
+            }
+            // TODO clear all fields when done
+            // TODO go over this and make sure it's valid
+            case LOCATION_NOT_FOUND -> locationLabel.setText("Couldn't find location! Please try again.");
+            case API_ERROR -> locationLabel.setText("Couldn't connect to weather API.");
+            case NOT_OKAY -> locationLabel.setText("Something went wrong! AAAAA");
         }
-
-        locationLabel.setText(String.format("Current Location: %s, %s", cityName, country));
     }
 
     @Override
@@ -146,18 +138,17 @@ public class Main extends Application {
         Logger.print(MessageType.JW_INFO, "Starting JocularWeather.jar.EXE");
         ArrayList<String> savedLocations = Fetcher.getSavedLocations();
 
-
         // Map ZIP code and weather report objects together
         Logger.print(MessageType.JW_INFO, "Requesting weather reports for saved locations");
-        TreeMap<String, Report> savedLocationReports = fetcher.getWeatherReports(savedLocations);
+        TreeMap<String, ReportBase> savedLocationReports = fetcher.getWeatherReports(savedLocations);
         formatReport(fetcher.getWeatherReport(fetcher.getCurrentCity()));
 
         Logger.print(MessageType.JW_INFO, "Rendering saved locations");
 
-        for (Map.Entry<String, Report> entry : savedLocationReports.entrySet()) {
+        for (Map.Entry<String, ReportBase> entry : savedLocationReports.entrySet()) {
             // Update location boxes in sidebar
             String zip = entry.getKey();
-            Report report = entry.getValue();
+            ReportBase report = entry.getValue();
             Logger.print(MessageType.JW_INFO, report.toString());
 
             savedLocationBoxes.add(formatLocationBox(zip, report));
@@ -183,7 +174,7 @@ public class Main extends Application {
         rightSearchField.setPromptText("Enter location...");
         rightSearchField.setOnAction((e) -> formatReport(fetcher.getWeatherReport(rightSearchField.getText())));
         rightSearchButton.setOnAction((e) -> formatReport(fetcher.getWeatherReport(rightSearchField.getText())));
-        jokeButton.setOnAction((e) -> jokeLabel.setText(getWeatherJoke()));
+        jokeButton.setOnAction((e) -> jokeLabel.setText(Fetcher.getWeatherJoke()));
 
         // Adjust spacing for right pane content
         leftSearchGroup.setSpacing(20);
@@ -228,15 +219,25 @@ public class Main extends Application {
      * @param report Report object
      * @return LocationBox associated location box
      */
-    private LocationBox formatLocationBox(String zip, Report report) {
-        LocationBox box = new LocationBox(String.format("%s, %s", report.name(), report.sys().country()), zip);
-        box.setCondition(report.weather().get(0).main());
-        box.setTemperature(String.format("%s °F", report.main().temp()));
+    private LocationBox formatLocationBox(String zip, ReportBase report) {
+        LocationBox box;
+        if (report.type().equals(ResultType.OKAY)) {
+            // Set up correctly formatted weather
+            Report weather = (Report) report;
+            box = new LocationBox(String.format("%s, %s", weather.name(), weather.sys().country()), zip);
+            box.setCondition(weather.weather().get(0).main());
+            box.setTemperature(String.format("%s °F", weather.main().temp()));
 
-        // Set updater for bringing saved location into focus
-        box.setOnMouseClicked((e) -> formatReport(fetcher.getWeatherReport(box.getZip())));
+            // Set updater for bringing saved location into focus
+            box.setOnMouseClicked((e) -> formatReport(fetcher.getWeatherReport(box.getZip())));
+        } else {
+            // Show malformed location box
+            box = new LocationBox("Couldn't find", zip);
+            box.setCondition(zip);
+            box.setTemperature("☒☒ °F");
+        }
 
-        // Set updater for deleting box
+        // Configure delete action
         box.getDeleteButton().setOnAction((e) -> {
             fetcher.removeZipFromSaved(zip);
             savedLocationBoxes.remove(box);
@@ -244,11 +245,12 @@ public class Main extends Application {
             locationsGroup.getChildren().clear();
             locationsGroup.getChildren().addAll(savedLocationBoxes);
         });
+
         return box;
     }
 
     /**
-     * Add location to group of location boxes
+     * Add location to group of location boxes.
      *
      * @param zip 5 digit United States ZIP code
      */

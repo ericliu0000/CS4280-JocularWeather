@@ -12,6 +12,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.TreeMap;
 
 /**
@@ -26,7 +27,7 @@ public class Fetcher {
     private static final String BASE_URL = getEnv("BASE_URL");
 
     /**
-     * Returns environment variable with desired key
+     * Returns environment variable with desired key.
      *
      * @param key name of key
      * @return String environment variable value
@@ -55,7 +56,7 @@ public class Fetcher {
     }
 
     /**
-     * Push location to database
+     * Push location to database.
      *
      * @param zipCode ZIP code or location
      * @param lon     longitude
@@ -86,7 +87,7 @@ public class Fetcher {
     }
 
     /**
-     * Returns saved locations in local file
+     * Returns saved locations in local file.
      *
      * @return ArrayList of strings containing the locations
      */
@@ -101,7 +102,7 @@ public class Fetcher {
     }
 
     /**
-     * Returns whether a string is not possibly a valid United States ZIP Code
+     * Returns whether a string is not possibly a valid United States ZIP Code.
      *
      * @param str any string
      * @return boolean whether the string is only five digits
@@ -116,7 +117,7 @@ public class Fetcher {
     }
 
     /**
-     * Pull current city from user IP
+     * Pull current city from user IP.
      *
      * @return String city, blank if not found
      */
@@ -149,12 +150,12 @@ public class Fetcher {
     }
 
     /**
-     * Get weather report from API
+     * Get weather report from API.
      *
      * @param zipCode desired ZIP code or city name to find location at
      * @return Report object representing unpacked JSON data
      */
-    public Report getWeatherReport(String zipCode) {
+    public ReportBase getWeatherReport(String zipCode) {
         Logger.print(MessageType.JW_INFO, "Trying to get weather report for " + zipCode + " from API");
         StringBuilder content = new StringBuilder();
         String combinedURL;
@@ -174,8 +175,9 @@ public class Fetcher {
             connection = (HttpURLConnection) new URI(combinedURL).toURL().openConnection();
             connection.setRequestMethod("GET");
         } catch (IOException | URISyntaxException e) {
+            Logger.print(MessageType.JW_ERROR, "API couldn't be opened");
             e.printStackTrace();
-            return null;
+            return new MalformedReport(ResultType.API_ERROR);
         }
 
         // Pull data from API
@@ -185,9 +187,9 @@ public class Fetcher {
             while ((inputLine = in.readLine()) != null) {
                 content.append(inputLine);
             }
-        } catch (Exception e) {
-            e.printStackTrace();
-            return null;
+        } catch (IOException e) {
+            Logger.print(MessageType.JW_ERROR, "Location not found");
+            return new MalformedReport(ResultType.LOCATION_NOT_FOUND);
         }
 
         try {
@@ -206,7 +208,7 @@ public class Fetcher {
     }
 
     /**
-     * Remove ZIP from list of stored ZIP codes
+     * Remove ZIP from list of stored ZIP codes.
      *
      * @param zip target ZIP code to remove
      * @return whether method succeeded
@@ -237,7 +239,7 @@ public class Fetcher {
     }
 
     /**
-     * Save ZIP code to local file
+     * Save ZIP code to local file.
      *
      * @param zip zip code to save
      * @return whether method succeeded
@@ -258,9 +260,9 @@ public class Fetcher {
     }
 
     /**
-     * Save ZIP code to local file
+     * Save ZIP code to local file.
      *
-     * @param zip zip code to check if it's in locationStorage.txt
+     * @param zip zip code to check if it is in locationStorage.txt
      * @return whether zip code is in saved locations file
      */
     public boolean isInSavedZips(String zip) {
@@ -279,19 +281,32 @@ public class Fetcher {
     }
 
     /**
-     * Get weather reports in bulk
+     * Get weather reports in bulk.
      *
      * @param zips list of ZIP codes/locations to pull from
      * @return Report[] array of reports
      */
-    public TreeMap<String, Report> getWeatherReports(ArrayList<String> zips) {
-        TreeMap<String, Report> reports = new TreeMap<>();
-        // ArrayList<Report> reports = new ArrayList<>();
+    public TreeMap<String, ReportBase> getWeatherReports(ArrayList<String> zips) {
+        TreeMap<String, ReportBase> reports = new TreeMap<>();
 
         for (String zip : zips) {
             reports.put(zip, getWeatherReport(zip));
         }
 
         return reports;
+    }
+    /**
+     * Returns random weather joke
+     *
+     * @return String containing pure humor
+     */
+    public static String getWeatherJoke() {
+        try {
+            List<String> jokes = Files.readAllLines(Paths.get("src/main/resources/weather-jokes.txt"));
+            return jokes.get((int) (Math.random() * jokes.size()));
+        } catch (IOException e) {
+            e.printStackTrace();
+            return "No joke available :(";
+        }
     }
 }
