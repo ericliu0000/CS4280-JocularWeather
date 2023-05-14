@@ -14,8 +14,6 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.TreeMap;
 
-import org.nothing.jocularweather.Logger.MessageType;
-
 public class Fetcher {
     public static final String CITY_URL = "https://98q0kalf91.execute-api.us-east-1.amazonaws.com/ip";
     private static final String API_KEY = getEnv("API_KEY");

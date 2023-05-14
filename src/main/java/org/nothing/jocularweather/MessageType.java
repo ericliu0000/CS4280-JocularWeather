@@ -3,7 +3,7 @@ package org.nothing.jocularweather;
 /**
  * Handles types of messages in program console output.
  */
-enum MessageType {
+public enum MessageType {
     /**
      * Informational output; corresponds to green text.
      */
