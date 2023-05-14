@@ -12,6 +12,9 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.TreeMap;
+
+import org.nothing.jocularweather.Logger.MessageType;
 
 public class Fetcher {
     public static final String CITY_URL = "https://98q0kalf91.execute-api.us-east-1.amazonaws.com/ip";
@@ -28,6 +31,7 @@ public class Fetcher {
      * @return String environment variable value
      */
     public static String getEnv(String key) {
+        Logger.print(MessageType.JW_INFO, "Loading environment variable " + key + " from .env file");
         ArrayList<String> constants;
 
         try {
@@ -39,8 +43,10 @@ public class Fetcher {
                 }
             }
         } catch (FileNotFoundException e) {
+            Logger.print(MessageType.JW_ERROR, "File .env not found");
             throw new RuntimeException("Environment variables not found");
         } catch (IOException e) {
+            Logger.print(MessageType.JW_ERROR, "Environment variable" + key + "could not be read");
             throw new RuntimeException(".env file could not be read");
         }
 
@@ -55,15 +61,18 @@ public class Fetcher {
      * @param lat     latitude
      */
     public static void pushToDB(String zipCode, double lon, double lat) {
-        String dbUrl = "https://98q0kalf91.execute-api.us-east-1.amazonaws.com/pushdb?zip=" + zipCode + "&lon=" + lon + "&lat=" + lat;
+        String dbUrl = "https://98q0kalf91.execute-api.us-east-1.amazonaws.com/pushdb?zip=" + zipCode + "&lon=" + lon
+                + "&lat=" + lat;
 
         try {
+            Logger.print(MessageType.JW_INFO, "Pushing " + zipCode + " to database");
             HttpURLConnection connection = (HttpURLConnection) new URI(dbUrl).toURL().openConnection();
             connection.setRequestMethod("GET");
             BufferedReader in = new BufferedReader(new InputStreamReader(connection.getInputStream()));
 
             in.close();
         } catch (Exception e) {
+            Logger.print(MessageType.JW_ERROR, "Could not push " + zipCode + " to database");
             e.printStackTrace();
         }
 
@@ -76,9 +85,11 @@ public class Fetcher {
      */
     public static ArrayList<String> getSavedLocations() {
         try {
+            Logger.print(MessageType.JW_INFO, "Loading saved locations from local file");
             return (ArrayList<String>) Files.readAllLines(Paths.get("src/main/resources/locationStorage.txt"));
         } catch (IOException e) {
             e.printStackTrace();
+            Logger.print(MessageType.JW_ERROR, "Could not load saved locations from local file");
             throw new RuntimeException(e);
         }
     }
@@ -106,16 +117,17 @@ public class Fetcher {
     public String getCurrentCity() {
         HttpURLConnection connection;
         try {
+            Logger.print(MessageType.JW_INFO, "Requesting current city from API");
             connection = (HttpURLConnection) new URI(CITY_URL).toURL().openConnection();
             connection.setRequestMethod("GET");
         } catch (IOException | URISyntaxException e) {
             e.printStackTrace();
+
             return "";
         }
 
         try (BufferedReader in = new BufferedReader(new InputStreamReader(connection.getInputStream()))) {
             String inputLine;
-
             StringBuilder content = new StringBuilder();
             while ((inputLine = in.readLine()) != null) {
                 content.append(inputLine);
@@ -136,11 +148,14 @@ public class Fetcher {
      * @return Report object representing unpacked JSON data
      */
     public Report getWeatherReport(String zipCode) {
+        Logger.print(MessageType.JW_INFO, "Trying to get weather report for " + zipCode + " from API");
         StringBuilder content = new StringBuilder();
         String combinedURL;
 
         // Search by city if a ZIP code was not added
         if (isNotZip(zipCode)) {
+            // replace all " " with "%20" for URL
+            zipCode = zipCode.replaceAll(" ", "%20");
             combinedURL = BASE_URL + "?appid=" + API_KEY + "&q=" + zipCode + "&units=imperial";
         } else {
             combinedURL = BASE_URL + "?appid=" + API_KEY + "&zip=" + zipCode + "&units=imperial";
@@ -168,7 +183,6 @@ public class Fetcher {
             return null;
         }
 
-
         try {
             // Move JSON into Report record
             ObjectMapper mapper = new ObjectMapper();
@@ -191,6 +205,7 @@ public class Fetcher {
      * @return whether method succeeded
      */
     public boolean removeZipFromSaved(String zip) {
+        Logger.print(MessageType.JW_INFO, "Removing " + zip + " from saved locations");
         if (isNotZip(zip)) {
             return false;
         }
@@ -221,6 +236,7 @@ public class Fetcher {
      * @return whether method succeeded
      */
     public boolean addZipToSaved(String zip) {
+        Logger.print(MessageType.JW_INFO, "Adding " + zip + " to saved locations");
         if (isNotZip(zip)) {
             return false;
         }
@@ -235,16 +251,38 @@ public class Fetcher {
     }
 
     /**
+     * Save ZIP code to local file
+     *
+     * @param zip zip code to check if it's in locationStorage.txt
+     * @return whether zip code is in saved locations file
+     */
+    public boolean isInSavedZips(String zip) {
+        try {
+            ArrayList<String> zips = getSavedLocations();
+            for (String z : zips) {
+                if (z.equals(zip)) {
+                    return true;
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return false;
+    }
+
+    /**
      * Get weather reports in bulk
      *
      * @param zips list of ZIP codes/locations to pull from
      * @return Report[] array of reports
      */
-    public ArrayList<Report> getWeatherReports(ArrayList<String> zips) {
-        ArrayList<Report> reports = new ArrayList<>();
+    public TreeMap<String, Report> getWeatherReports(ArrayList<String> zips) {
+        TreeMap<String, Report> reports = new TreeMap<>();
+        // ArrayList<Report> reports = new ArrayList<>();
 
         for (String zip : zips) {
-            reports.add(getWeatherReport(zip));
+            reports.put(zip, getWeatherReport(zip));
         }
 
         return reports;

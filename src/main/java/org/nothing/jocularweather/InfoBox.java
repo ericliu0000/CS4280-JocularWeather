@@ -21,6 +21,8 @@ public class InfoBox extends VBox {
     public InfoBox(String title, String body, Node... children) {
         Label headerLabel = new Label(title);
         contentLabel = new Label(body);
+        contentGroup.setAlignment(Pos.CENTER);
+
         contentGroup.getChildren().add(contentLabel);
         contentGroup.getChildren().addAll(children);
 

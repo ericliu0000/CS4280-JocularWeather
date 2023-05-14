@@ -21,6 +21,8 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.*;
 
+import org.nothing.jocularweather.Logger.MessageType;
+
 public class Main extends Application {
 
     private static final Label titleLabel = new Label("JocularWeather.jar.EXE");
@@ -28,19 +30,24 @@ public class Main extends Application {
     private static final Button searchButton = new Button("Search");
     private static final HBox searchGroup = new HBox(searchField, searchButton);
     private static final Label locationLabel = new Label("");
-    private static final ImageView conditionsIcon = new ImageView(new Image("icons/01n.png"));
+    // private static final ImageView conditionsIcon = new ImageView(new
+    // Image("icons/01n.png"));
     private static final InfoBox feelsLikeBox = new InfoBox("Feels like", "");
     private static final InfoBox tempBox = new InfoBox("Current temperature", "");
-    private static final InfoBox conditionsBox = new InfoBox("Conditions", "", conditionsIcon);
+    private static final InfoBox conditionsBox = new InfoBox("Conditions", ""); // , conditionsIcon); //
     private static final InfoBox sunriseBox = new InfoBox("Sunrise", "");
     private static final InfoBox sunsetBox = new InfoBox("Sunset", "");
-    private static final FlowPane contentGroup = new FlowPane(feelsLikeBox, tempBox, conditionsBox, sunriseBox, sunsetBox);
+    private static final FlowPane contentGroup = new FlowPane(feelsLikeBox, tempBox, conditionsBox, sunriseBox,
+            sunsetBox);
     private static final VBox contentBox = new VBox(locationLabel, contentGroup);
     private static final Button jokeButton = new Button("Get Joke");
     private static final Label jokeLabel = new Label();
     private static final VBox jokeGroup = new VBox(jokeButton, jokeLabel);
-    private static final AnchorPane leftPane = new AnchorPane();
     private static final VBox rightPane = new VBox();
+
+    private static final VBox locationsGroup = new VBox();
+    private static final VBox leftPane = new VBox();
+
     private final Fetcher fetcher = new Fetcher();
 
     /**
@@ -58,7 +65,8 @@ public class Main extends Application {
         time.setTimeZone(new SimpleTimeZone((int) (timeZone * 1000), ""));
         time.setTime(myDate);
 
-        return String.format("%s:%s %s", time.get(Calendar.HOUR), time.get(Calendar.MINUTE), (time.get(Calendar.AM_PM) == Calendar.AM ? "AM" : "PM"));
+        return String.format("%d:%02d %s", time.get(Calendar.HOUR), time.get(Calendar.MINUTE),
+                (time.get(Calendar.AM_PM) == Calendar.AM ? "AM" : "PM"));
     }
 
     public static void main(String[] args) {
@@ -108,15 +116,35 @@ public class Main extends Application {
 
     @Override
     public void start(Stage stage) {
+        Logger.print(MessageType.JW_INFO, "Starting JocularWeather.jar.EXE");
         // Pull saved locations from database and get current report
         ArrayList<String> savedLocations = Fetcher.getSavedLocations();
-        ArrayList<Report> savedLocationReports = fetcher.getWeatherReports(savedLocations);
+        ArrayList<LocationBox> savedLocationBoxes = new ArrayList<>();
+
+        Logger.print(MessageType.JW_INFO, "Requesting weather reports for saved locations");
+
+        TreeMap<String, Report> savedLocationReports = fetcher.getWeatherReports(savedLocations);
         formatReport(fetcher.getWeatherReport(fetcher.getCurrentCity()));
 
         // Testing: print out reports
-        for (Report savedLocationReport : savedLocationReports) {
-            System.out.println(savedLocationReport);
+        Logger.print(MessageType.JW_INFO, "Rendering saved locations");
+        for (Map.Entry<String, Report> entry : savedLocationReports.entrySet()) {
+            Report report = entry.getValue();
+            Logger.print(MessageType.JW_INFO, report.toString());
+
+            LocationBox box = new LocationBox(String.format("%s, %s", report.name(), report.sys().country()),
+                    entry.getKey());
+            box.setCondition(report.weather().get(0).main());
+            box.setTemperature(Math.round(report.main().temp()));
+
+            // Set updater for clicking on it
+            box.setOnMouseClicked((e) -> formatReport(fetcher.getWeatherReport(box.getZip())));
+
+            savedLocationBoxes.add(box);
         }
+
+        // Put boxes into group
+        locationsGroup.getChildren().addAll(savedLocationBoxes);
 
         // Configure prompts
         searchField.setPromptText("Enter location...");
@@ -137,12 +165,18 @@ public class Main extends Application {
         contentBox.setAlignment(Pos.CENTER);
         jokeGroup.setAlignment(Pos.CENTER);
         rightPane.setAlignment(Pos.CENTER);
+
+        // TODO add zip add search bar
+        leftPane.getChildren().addAll(savedLocationBoxes);
         rightPane.getChildren().addAll(titleLabel, searchGroup, locationLabel, contentBox, jokeGroup);
 
-        Scene scene = new Scene(rightPane, 640, 480);
-        scene.getStylesheets().add("style.css");
+        // create the scene
+        Scene scene = new Scene(new HBox(leftPane, rightPane), 640, 480);
+        scene.getStylesheets().add("style.css"); // add the CSS
 
+        // set the stage and scene, and show the stage
         stage.setScene(scene);
         stage.show();
     }
+
 }
