@@ -167,6 +167,9 @@ public class Main extends Application {
 
                 fetcher.removeZipFromSaved(zip);
                 savedLocationBoxes.remove(box);
+
+                locationsGroup.getChildren().clear();
+                locationsGroup.getChildren().addAll(savedLocationBoxes);
             });
             savedLocationBoxes.add(box);
         }
@@ -200,7 +203,7 @@ public class Main extends Application {
 
         // TODO add zip add search bar
         // TODO add a line between the two
-        leftPane.getChildren().addAll(savedLocationBoxes);
+        leftPane.getChildren().addAll(locationsGroup);
         rightPane.getChildren().addAll(titleLabel, searchGroup, locationLabel, contentBox, jokeGroup);
 
         // Assemble entire scene
