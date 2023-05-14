@@ -2,6 +2,7 @@ package org.nothing.jocularweather;
 
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
+import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
@@ -17,6 +18,7 @@ import javafx.scene.layout.VBox;
 public class LocationBox extends HBox {
     private final Label conditionLabel = new Label("Not available");
     private final Label temperatureLabel = new Label("nn");
+    private final Button deleteButton = new Button("x");
 
     private final String zip;
 
@@ -39,11 +41,16 @@ public class LocationBox extends HBox {
         Region centerBuffer = new Region();
         HBox.setHgrow(centerBuffer, Priority.ALWAYS);
 
-        this.setPrefWidth(250);
-        this.setMinWidth(200);
+        deleteButton.setAlignment(Pos.TOP_RIGHT);
+        deleteButton.setPrefSize(20, 20);
+
+        this.setPrefWidth(220);
+        this.setMinWidth(220);
+
         this.setAlignment(Pos.CENTER_LEFT);
         this.setPadding(new Insets(10));
-        this.getChildren().addAll(leftGroup, centerBuffer, temperatureLabel);
+        this.setSpacing(5);
+        this.getChildren().addAll(leftGroup, centerBuffer, temperatureLabel, deleteButton);
     }
 
     /**
@@ -71,5 +78,14 @@ public class LocationBox extends HBox {
      */
     public String getZip() {
         return zip;
+    }
+
+    /**
+     * Returns delete button object
+     *
+     * @return Button
+     */
+    public Button getDeleteButton() {
+        return deleteButton;
     }
 }

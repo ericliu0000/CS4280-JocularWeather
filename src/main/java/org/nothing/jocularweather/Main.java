@@ -150,6 +150,7 @@ public class Main extends Application {
         formatReport(fetcher.getWeatherReport(fetcher.getCurrentCity()));
 
         Logger.print(MessageType.JW_INFO, "Rendering saved locations");
+
         for (Map.Entry<String, Report> entry : savedLocationReports.entrySet()) {
             Report report = entry.getValue();
             Logger.print(MessageType.JW_INFO, report.toString());
@@ -161,6 +162,12 @@ public class Main extends Application {
 
             // Set updater for box
             box.setOnMouseClicked((e) -> formatReport(fetcher.getWeatherReport(box.getZip())));
+            box.getDeleteButton().setOnAction((e) -> {
+                String zip = box.getZip();
+
+                fetcher.removeZipFromSaved(zip);
+                savedLocationBoxes.remove(box);
+            });
             savedLocationBoxes.add(box);
         }
 
@@ -173,21 +180,23 @@ public class Main extends Application {
         searchButton.setOnAction((e) -> formatReport(fetcher.getWeatherReport(searchField.getText())));
         jokeButton.setOnAction((e) -> jokeLabel.setText(getWeatherJoke()));
 
-        // Adjust spacing for everything
+        // Adjust spacing for right pane content
         searchGroup.setSpacing(20);
         contentGroup.setPrefWidth(600);
         contentGroup.setHgap(20);
         contentGroup.setPadding(new Insets(10));
-        leftPane.setSpacing(10);
-        rightPane.setSpacing(10);
 
         // Align everything in right pane and push together
         searchGroup.setAlignment(Pos.CENTER);
         contentGroup.setAlignment(Pos.CENTER);
         contentBox.setAlignment(Pos.CENTER);
         jokeGroup.setAlignment(Pos.CENTER);
+
+        // Set spacing for pane parent objects
+        leftPane.setSpacing(10);
+        rightPane.setSpacing(10);
         leftPane.setAlignment(Pos.TOP_LEFT);
-        rightPane.setAlignment(Pos.CENTER);
+        rightPane.setAlignment(Pos.TOP_CENTER);
 
         // TODO add zip add search bar
         // TODO add a line between the two
@@ -198,7 +207,7 @@ public class Main extends Application {
         HBox allContent = new HBox(leftPane, rightPane);
         HBox.setHgrow(allContent, Priority.ALWAYS);
 
-        Scene scene = new Scene(allContent, 680, 480);
+        Scene scene = new Scene(allContent, 680, 500);
         scene.getStylesheets().add("style.css");
 
         // set the stage and scene, and show the stage
