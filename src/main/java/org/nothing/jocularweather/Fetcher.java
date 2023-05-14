@@ -78,7 +78,7 @@ public class Fetcher {
 
         // Push information
         try (BufferedReader ignored = new BufferedReader(new InputStreamReader(connection.getInputStream()))) {
-            Logger.print(MessageType.JW_INFO, "Pushing " + zipCode + " to database. ");
+            Logger.print(MessageType.JW_INFO, "Pushing " + zipCode + " to database");
         } catch (Exception e) {
             Logger.print(MessageType.JW_ERROR, "Could not push " + zipCode + " to database");
             e.printStackTrace();
@@ -248,8 +248,8 @@ public class Fetcher {
             return false;
         }
 
-        try (FileWriter writer = new FileWriter("src/main/resources/locationStorage.txt")) {
-            writer.append(zip);
+        try (FileWriter writer = new FileWriter("src/main/resources/locationStorage.txt", true)) {
+            writer.append("\n").append(zip);
             return true;
         } catch (IOException e) {
             e.printStackTrace();
