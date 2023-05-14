@@ -62,21 +62,27 @@ public class Fetcher {
      * @param lat     latitude
      */
     public static void pushToDB(String zipCode, double lon, double lat) {
-        String dbUrl = "https://98q0kalf91.execute-api.us-east-1.amazonaws.com/pushdb?zip=" + zipCode + "&lon=" + lon
-                + "&lat=" + lat;
+        String dbUrl = "https://98q0kalf91.execute-api.us-east-1.amazonaws.com/pushdb?zip=" + zipCode + "&lon=" + lon + "&lat=" + lat;
 
+        HttpURLConnection connection;
         try {
-            Logger.print(MessageType.JW_INFO, "Pushing " + zipCode + " to database");
-            HttpURLConnection connection = (HttpURLConnection) new URI(dbUrl).toURL().openConnection();
-            connection.setRequestMethod("GET");
-            BufferedReader in = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+            Logger.print(MessageType.JW_INFO, "Opening connection to database");
 
-            in.close();
+            // Connect to API for data storage
+            connection = (HttpURLConnection) new URI(dbUrl).toURL().openConnection();
+            connection.setRequestMethod("GET");
+        } catch (IOException | URISyntaxException e) {
+            Logger.print(MessageType.JW_ERROR, "Unable to connect to database");
+            throw new RuntimeException(e);
+        }
+
+        // Push information
+        try (BufferedReader ignored = new BufferedReader(new InputStreamReader(connection.getInputStream()))) {
+            Logger.print(MessageType.JW_INFO, "Pushing " + zipCode + " to database. ");
         } catch (Exception e) {
             Logger.print(MessageType.JW_ERROR, "Could not push " + zipCode + " to database");
             e.printStackTrace();
         }
-
     }
 
     /**
@@ -89,7 +95,6 @@ public class Fetcher {
             Logger.print(MessageType.JW_INFO, "Loading saved locations from local file");
             return (ArrayList<String>) Files.readAllLines(Paths.get("src/main/resources/locationStorage.txt"));
         } catch (IOException e) {
-            e.printStackTrace();
             Logger.print(MessageType.JW_ERROR, "Could not load saved locations from local file");
             throw new RuntimeException(e);
         }
@@ -118,16 +123,17 @@ public class Fetcher {
     public String getCurrentCity() {
         HttpURLConnection connection;
         try {
+            // Pull city from API
             Logger.print(MessageType.JW_INFO, "Requesting current city from API");
             connection = (HttpURLConnection) new URI(CITY_URL).toURL().openConnection();
             connection.setRequestMethod("GET");
         } catch (IOException | URISyntaxException e) {
             e.printStackTrace();
-
             return "";
         }
 
         try (BufferedReader in = new BufferedReader(new InputStreamReader(connection.getInputStream()))) {
+            // Attempt to resolve output
             String inputLine;
             StringBuilder content = new StringBuilder();
             while ((inputLine = in.readLine()) != null) {
