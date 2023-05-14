@@ -88,12 +88,12 @@ public class Fetcher {
      * @param str any string
      * @return boolean whether the string is only digits
      */
-    public static boolean isNumeric(String str) {
+    public static boolean isNotZip(String str) {
         try {
             Double.parseDouble(str);
-            return true;
+            return str.length() != 5;
         } catch (NumberFormatException e) {
-            return false;
+            return true;
         }
     }
 
@@ -134,7 +134,8 @@ public class Fetcher {
         StringBuilder content = new StringBuilder();
         String combinedURL = BASE_URL + "?appid=" + API_KEY + "&zip=" + zipCode + "&units=imperial";
 
-        if (!isNumeric(zipCode)) {
+        // Search by city if a ZIP code was not added
+        if (isNotZip(zipCode)) {
             combinedURL = BASE_URL + "?appid=" + API_KEY + "&q=" + zipCode + "&units=imperial";
         }
 
@@ -177,7 +178,7 @@ public class Fetcher {
      * @return whether method succeeded
      */
     public boolean removeZipFromSaved(String zip) {
-        if (!(zip.length() == 5)) {
+        if (isNotZip(zip)) {
             return false;
         }
 
@@ -207,7 +208,7 @@ public class Fetcher {
      * @return whether method succeeded
      */
     public boolean addZipToSaved(String zip) {
-        if (!(zip.length() == 5)) {
+        if (isNotZip(zip)) {
             return false;
         }
 
