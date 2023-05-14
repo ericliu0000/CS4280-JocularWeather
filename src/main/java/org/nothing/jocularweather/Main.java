@@ -48,7 +48,7 @@ public class Main extends Application {
     private static final VBox jokeGroup = new VBox(jokeButton, jokeLabel);
     private static final VBox rightPane = new VBox();
     private static final TextField leftSearchField = new TextField();
-    private static final Button leftSearchButton = new Button("Add location");
+    private static final Button leftSearchButton = new Button("Add");
     private static final HBox leftSearchGroup = new HBox(leftSearchField, leftSearchButton);
     private static final VBox locationsGroup = new VBox();
     private static final VBox leftPane = new VBox();
@@ -76,6 +76,7 @@ public class Main extends Application {
 
     /**
      * Runs program
+     *
      * @param args Command line arguments; unused
      */
     public static void main(String[] args) {
@@ -145,9 +146,9 @@ public class Main extends Application {
         Logger.print(MessageType.JW_INFO, "Starting JocularWeather.jar.EXE");
         ArrayList<String> savedLocations = Fetcher.getSavedLocations();
 
-        Logger.print(MessageType.JW_INFO, "Requesting weather reports for saved locations");
 
         // Map ZIP code and weather report objects together
+        Logger.print(MessageType.JW_INFO, "Requesting weather reports for saved locations");
         TreeMap<String, Report> savedLocationReports = fetcher.getWeatherReports(savedLocations);
         formatReport(fetcher.getWeatherReport(fetcher.getCurrentCity()));
 
@@ -167,15 +168,15 @@ public class Main extends Application {
 
         // Configure prompts
         leftSearchField.setPromptText("Enter ZIP...");
-        // TODO handle invalid ZIPs properly
         leftSearchField.setOnAction((e) -> {
+            // TODO handle invalid ZIPs properly
             if (fetcher.addZipToSaved(leftSearchField.getText())) {
-                String zip = leftSearchField.getText();
-                savedLocationBoxes.add(formatLocationBox(zip, fetcher.getWeatherReport(zip)));
-
-                // Refresh locations
-                locationsGroup.getChildren().clear();
-                locationsGroup.getChildren().addAll(savedLocationBoxes);
+                addLocation(leftSearchField.getText());
+            }
+        });
+        leftSearchButton.setOnAction((e) -> {
+            if (fetcher.addZipToSaved(leftSearchField.getText())) {
+                addLocation(leftSearchField.getText());
             }
         });
 
@@ -198,29 +199,35 @@ public class Main extends Application {
         contentBox.setAlignment(Pos.CENTER);
         jokeGroup.setAlignment(Pos.CENTER);
 
-        // Set spacing for pane parent objects
+        // Set spacing for pane parent object
+        leftPane.setPadding(new Insets(10));
         leftPane.setSpacing(10);
         rightPane.setSpacing(10);
         leftPane.setAlignment(Pos.TOP_LEFT);
         rightPane.setAlignment(Pos.TOP_CENTER);
 
-        // TODO add zip add search bar
-        // TODO add a line between the two
         leftPane.getChildren().addAll(leftSearchGroup, locationsGroup);
         rightPane.getChildren().addAll(titleLabel, rightSearchGroup, locationLabel, contentBox, jokeGroup);
 
         // Assemble entire scene
         HBox allContent = new HBox(leftPane, rightPane);
         HBox.setHgrow(allContent, Priority.ALWAYS);
+        allContent.setPadding(new Insets(20));
 
-        Scene scene = new Scene(allContent, 680, 500);
+        Scene scene = new Scene(allContent, 720, 480);
         scene.getStylesheets().add("style.css");
 
-        // set the stage and scene, and show the stage
         stage.setScene(scene);
         stage.show();
     }
 
+    /**
+     * Returns location box given a specific location and its corresponding weather report.
+     *
+     * @param zip    5 digit United States ZIP code
+     * @param report Report object
+     * @return LocationBox associated location box
+     */
     private LocationBox formatLocationBox(String zip, Report report) {
         LocationBox box = new LocationBox(String.format("%s, %s", report.name(), report.sys().country()), zip);
         box.setCondition(report.weather().get(0).main());
@@ -231,8 +238,6 @@ public class Main extends Application {
 
         // Set updater for deleting box
         box.getDeleteButton().setOnAction((e) -> {
-//            String zip = box.getZip();
-
             fetcher.removeZipFromSaved(zip);
             savedLocationBoxes.remove(box);
 
@@ -242,4 +247,18 @@ public class Main extends Application {
         return box;
     }
 
+    /**
+     * Add location to group of location boxes
+     *
+     * @param zip 5 digit United States ZIP code
+     */
+    private void addLocation(String zip) {
+        if (fetcher.addZipToSaved(zip)) {
+            savedLocationBoxes.add(formatLocationBox(zip, fetcher.getWeatherReport(zip)));
+
+            // Refresh locations
+            locationsGroup.getChildren().clear();
+            locationsGroup.getChildren().addAll(savedLocationBoxes);
+        }
+    }
 }
