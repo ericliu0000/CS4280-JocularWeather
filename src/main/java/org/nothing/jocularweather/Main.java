@@ -25,7 +25,7 @@ import java.util.*;
  */
 public class Main extends Application {
 
-    private static final Label titleLabel = new Label("JocularWeather");
+    private static final Label titleLabel = new Label("JocularWeather.jar.EXE");
     private static final TextField rightSearchField = new TextField();
     private static final Button rightSearchButton = new Button("Search");
     private static final HBox rightSearchGroup = new HBox(rightSearchField, rightSearchButton);
@@ -228,8 +228,7 @@ public class Main extends Application {
     }
 
     /**
-     * Returns location box given a specific location and its corresponding weather
-     * report.
+     * Returns an optional {@link LocationBox} given a specific location and its corresponding weather report.
      *
      * @param zip    5 digit United States ZIP code
      * @param report Report object

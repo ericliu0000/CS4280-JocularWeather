@@ -14,6 +14,7 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.TreeMap;
+import java.util.stream.Collectors;
 
 /**
  * Class for getting and putting information to weather, storage, and location APIs.
@@ -77,7 +78,7 @@ public class Fetcher {
             throw new RuntimeException(e);
         }
 
-        // Push information
+        // Push information to db
         try (BufferedReader ignored = new BufferedReader(new InputStreamReader(connection.getInputStream()))) {
             Logger.print(MessageType.JW_INFO, "Pushing " + zipCode + " to database");
         } catch (Exception e) {
@@ -94,7 +95,12 @@ public class Fetcher {
     public static ArrayList<String> getSavedLocations() {
         try {
             Logger.print(MessageType.JW_INFO, "Loading saved locations from local file");
-            return (ArrayList<String>) Files.readAllLines(Paths.get("src/main/resources/locationStorage.txt"));
+            List<String> locations = Files.readAllLines(Paths.get("src/main/resources/locationStorage.txt"));
+            // Remove empty lines
+            return (ArrayList<String>) locations
+                    .stream()
+                    .filter(e -> e.length() > 0)
+                    .collect(Collectors.toList());
         } catch (IOException e) {
             Logger.print(MessageType.JW_ERROR, "Could not load saved locations from local file");
             throw new RuntimeException(e);
@@ -295,6 +301,7 @@ public class Fetcher {
 
         return reports;
     }
+
     /**
      * Returns random weather joke
      *
@@ -302,7 +309,7 @@ public class Fetcher {
      */
     public static String getWeatherJoke() {
         try {
-            List<String> jokes = Files.readAllLines(Paths.get("src/main/resources/weather-jokes.txt"));
+            List<String> jokes = Files.readAllLines(Paths.get("src/main/resources/weatherJokes.txt"));
             return jokes.get((int) (Math.random() * jokes.size()));
         } catch (IOException e) {
             e.printStackTrace();

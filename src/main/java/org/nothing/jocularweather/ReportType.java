@@ -1,7 +1,8 @@
 package org.nothing.jocularweather;
 
 /**
- * Enumeration for type of report response.
+ * Enumeration for type of report response. Assigned to {@link Report} and {@link MalformedReport} depending on
+ * weather system API output.
  */
 public enum ReportType {
     /**
