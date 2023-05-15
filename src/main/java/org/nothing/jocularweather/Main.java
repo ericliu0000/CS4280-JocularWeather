@@ -29,7 +29,7 @@ public class Main extends Application {
     private static final TextField rightSearchField = new TextField();
     private static final Button rightSearchButton = new Button("Search");
     private static final HBox rightSearchGroup = new HBox(rightSearchField, rightSearchButton);
-    private static final Label locationLabel = new Label("");
+    private static final Label statusLabel = new Label("");
     private static final Image conditionsIcon = new Image(String.valueOf(Main.class.getResource("/icons/01d.png")), 20,
             20, false, false);
     private static final InfoBox feelsLikeBox = new InfoBox("Feels like", "");
@@ -42,7 +42,7 @@ public class Main extends Application {
     private static final InfoBox sunsetBox = new InfoBox("Sunset", "");
     private static final FlowPane contentGroup = new FlowPane(feelsLikeBox, tempBox, conditionsBox, humidityBox,
             pressureBox, windBox, sunriseBox, sunsetBox);
-    private static final VBox contentBox = new VBox(locationLabel, contentGroup);
+    private static final VBox contentBox = new VBox(statusLabel, contentGroup);
     private static final Button jokeButton = new Button("Get Joke");
     private static final Label jokeLabel = new Label();
     private static final VBox jokeGroup = new VBox(jokeButton, jokeLabel);
@@ -136,14 +136,36 @@ public class Main extends Application {
                     e.printStackTrace();
                 }
 
-                locationLabel.setText(String.format("Current Location: %s, %s", cityName, country));
+                statusLabel.setText("");
             }
-            // TODO clear all fields when done
-            // TODO go over this and make sure it's valid
-            case LOCATION_NOT_FOUND -> locationLabel.setText("Couldn't find location! Please try again.");
-            case API_ERROR -> locationLabel.setText("Couldn't connect to weather API.");
-            case NOT_OKAY -> locationLabel.setText("Something went wrong! AAAAA");
+            case LOCATION_NOT_FOUND -> {
+                statusLabel.setText("Couldn't find location! Please try again.");
+                clearFields();
+            }
+            case API_ERROR -> {
+                statusLabel.setText("Couldn't connect to weather API.");
+                clearFields();
+            }
+            case NOT_OKAY -> {
+                statusLabel.setText("Something went wrong! AAAAA");
+                clearFields();
+            }
         }
+    }
+
+    /**
+     * Instantializes empty weather report fields
+     */
+    public void clearFields() {
+        feelsLikeBox.setContentText("");
+        tempBox.setContentText("");
+        conditionsBox.setContentText("");
+        humidityBox.setContentText("");
+        pressureBox.setContentText("");
+        windBox.setContentText("");
+        sunriseBox.setContentText("");
+        sunsetBox.setContentText("");
+        titleLabel.setText("JocularWeather");
     }
 
     @Override
@@ -215,7 +237,7 @@ public class Main extends Application {
         rightPane.setAlignment(Pos.TOP_CENTER);
 
         leftPane.getChildren().addAll(leftSearchGroup, leftLabel, locationsGroup);
-        rightPane.getChildren().addAll(titleLabel, rightSearchGroup, locationLabel, contentBox, jokeGroup);
+        rightPane.getChildren().addAll(titleLabel, rightSearchGroup, statusLabel, contentBox, jokeGroup);
 
         // Assemble entire scene
         allContent.getStyleClass().add("hbox");
@@ -243,7 +265,7 @@ public class Main extends Application {
                 Report weather = (Report) report;
                 box = new LocationBox(String.format("%s, %s", weather.name(), weather.sys().country()), zip);
                 box.setCondition(weather.weather().get(0).main());
-                box.setTemperature(String.format("%s °F", weather.main().temp()));
+                box.setTemperature(String.format("%d°F", Math.round(weather.main().temp())));
 
                 // Set updater for bringing saved location into focus
                 box.setOnMouseClicked((e) -> formatReport(fetcher.getWeatherReport(box.getZip())));
