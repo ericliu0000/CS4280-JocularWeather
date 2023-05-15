@@ -252,7 +252,7 @@ public class Main extends Application {
     }
 
     /**
-     * Returns an optional {@link LocationBox} given a specific location and its
+     * Returns an optional {@link org.nothing.jocularweather.LocationBox} given a specific location and its
      * corresponding weather report.
      *
      * @param zip    5 digit United States ZIP code

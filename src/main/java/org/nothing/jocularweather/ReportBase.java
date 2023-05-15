@@ -5,7 +5,7 @@ package org.nothing.jocularweather;
  */
 public interface ReportBase {
     /**
-     * Returns type of report to match {@link ReportType} enum
+     * Returns type of report to match {@link org.nothing.jocularweather.ReportType} enum
      * @return type of report
      */
     ReportType type();

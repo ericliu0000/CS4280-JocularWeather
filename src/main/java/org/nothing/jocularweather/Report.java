@@ -5,7 +5,7 @@ import java.util.List;
 /**
  * Parent class for JSON object from weather report. Follows <a href="https://openweathermap.org/current#current_JSON">API docs here</a>.
  * This implementation assumes that everything is okay; all usages of the class are initialized with the {@link ReportType#OKAY} type or
- * otherwise deferred to the {@link MalformedReport} type.
+ * otherwise deferred to the {@link org.nothing.jocularweather.MalformedReport} type.
  *
  * @param coord      location of station
  * @param weather    qualitative overview of weather
@@ -40,7 +40,7 @@ public record Report(Coordinates coord, List<Weather> weather, String base, Deta
 }
 
 /**
- * Object implementing {@link ReportBase} which contains no information and a message
+ * Object implementing {@link org.nothing.jocularweather.ReportBase} which contains no information and a message
  * containing its error type.
  *
  * @param type type of error
