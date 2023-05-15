@@ -19,7 +19,7 @@ import javafx.scene.layout.VBox;
 public class LocationBox extends HBox {
     private final Label conditionLabel = new Label("Not available");
     private final Label temperatureLabel = new Label("nn");
-    private final Button deleteButton = new Button("x");
+    private final Button deleteButton = new Button("❌");
 
     private final String zip;
 
@@ -56,6 +56,8 @@ public class LocationBox extends HBox {
         this.setPadding(new Insets(10));
         this.setSpacing(5);
         this.getChildren().addAll(leftGroup, centerBuffer, temperatureLabel, deleteButton);
+        this.getStyleClass().add("location-box");
+        this.setMargin(centerBuffer, getInsets());
 
     }
 

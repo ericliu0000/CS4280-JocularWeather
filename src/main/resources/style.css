@@ -40,6 +40,19 @@
   -fx-font-weight: bold;
 }
 
+.delete-button {
+  -fx-background-color: transparent;
+  -fx-text-background-color: white;
+  -fx-font-size: 8px;
+}
+.location-box {
+  -fx-background-color: #457b9d;
+  -fx-effect: dropshadow(three-pass-box, rgba(0, 0, 0, 0.8), 10, 0, 0, 0);
+
+  -fx-background-radius: 10px;
+  -fx-border-radius: 10px;
+  -fx-text-background-color: white;
+}
 /* .stack-pane {
   -fx-background-color: #ff00bf;
 }

@@ -195,6 +195,8 @@ public class Main extends Application {
         }
 
         // Put boxes into group
+
+        locationsGroup.setSpacing(10);
         locationsGroup.getChildren().addAll(savedLocationBoxes);
 
         // Configure prompts
@@ -249,7 +251,8 @@ public class Main extends Application {
     }
 
     /**
-     * Returns an optional {@link LocationBox} given a specific location and its corresponding weather report.
+     * Returns an optional {@link LocationBox} given a specific location and its
+     * corresponding weather report.
      *
      * @param zip    5 digit United States ZIP code
      * @param report Report object
