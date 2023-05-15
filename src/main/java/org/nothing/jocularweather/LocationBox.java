@@ -10,7 +10,8 @@ import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
 
 /**
- * Object containing elements that display current weather information of saved weather locations.
+ * Object containing elements that display current weather information of saved
+ * weather locations.
  *
  * @author Eric Liu
  * @author Ganning Xu
@@ -36,7 +37,7 @@ public class LocationBox extends HBox {
 
         VBox leftGroup = new VBox(locationLabel, conditionLabel);
         leftGroup.setAlignment(Pos.CENTER_LEFT);
-        leftGroup.setSpacing(10);
+        leftGroup.setSpacing(4);
 
         Region centerBuffer = new Region();
         HBox.setHgrow(centerBuffer, Priority.ALWAYS);
@@ -47,10 +48,15 @@ public class LocationBox extends HBox {
         this.setPrefWidth(220);
         this.setMinWidth(200);
 
+        conditionLabel.getStyleClass().add("condition-label");
+        temperatureLabel.getStyleClass().add("temperature-label");
+        locationLabel.getStyleClass().add("location-label");
+        deleteButton.getStyleClass().add("delete-button");
         this.setAlignment(Pos.CENTER_LEFT);
         this.setPadding(new Insets(10));
         this.setSpacing(5);
         this.getChildren().addAll(leftGroup, centerBuffer, temperatureLabel, deleteButton);
+
     }
 
     /**

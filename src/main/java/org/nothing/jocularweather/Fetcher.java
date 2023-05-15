@@ -17,7 +17,8 @@ import java.util.TreeMap;
 import java.util.stream.Collectors;
 
 /**
- * Class for getting and putting information to weather, storage, and location APIs.
+ * Class for getting and putting information to weather, storage, and location
+ * APIs.
  *
  * @author Ganning Xu
  * @author Eric Liu
@@ -64,7 +65,8 @@ public class Fetcher {
      * @param lat     latitude
      */
     public static void pushToDB(String zipCode, double lon, double lat) {
-        String dbUrl = "https://98q0kalf91.execute-api.us-east-1.amazonaws.com/pushdb?zip=" + zipCode + "&lon=" + lon + "&lat=" + lat;
+        String dbUrl = "https://98q0kalf91.execute-api.us-east-1.amazonaws.com/pushdb?zip=" + zipCode + "&lon=" + lon
+                + "&lat=" + lat;
 
         HttpURLConnection connection;
         try {

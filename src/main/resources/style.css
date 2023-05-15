@@ -21,6 +21,21 @@
 .header-label {
   -fx-font-weight: bold;
 }
+
+.condition-label {
+  -fx-text-background-color: white;
+}
+
+.temperature-label {
+  -fx-text-background-color: white;
+  -fx-font-size: 20px;
+}
+
+.location-label {
+  -fx-text-background-color: white;
+  -fx-font-weight: bold;
+}
+
 /* .stack-pane {
   -fx-background-color: #ff00bf;
 }
