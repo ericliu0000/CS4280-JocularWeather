@@ -9,7 +9,8 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 
 /**
- * Object containing elements to house weather report information. Includes option to add icon to contents.
+ * Object containing elements to house weather report information. Includes
+ * option to add icon to contents.
  *
  * @author Eric Liu
  * @author Ganning Xu
@@ -30,6 +31,7 @@ public class InfoBox extends VBox {
         icon.setImage(image);
 
         Label headerLabel = new Label(title);
+        headerLabel.getStyleClass().add("header-label");
         contentLabel = new Label(body);
         contentGroup.setAlignment(Pos.CENTER);
         contentGroup.getChildren().addAll(contentLabel, icon);
@@ -51,6 +53,7 @@ public class InfoBox extends VBox {
 
     public InfoBox(String title, String body) {
         Label headerLabel = new Label(title);
+        headerLabel.getStyleClass().add("header-label");
         contentLabel = new Label(body);
         contentGroup.setAlignment(Pos.CENTER);
 

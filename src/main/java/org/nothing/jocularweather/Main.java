@@ -25,7 +25,7 @@ import java.util.*;
  */
 public class Main extends Application {
 
-    private static final Label titleLabel = new Label("JocularWeather.jar.EXE");
+    private static final Label titleLabel = new Label("JocularWeather");
     private static final TextField rightSearchField = new TextField();
     private static final Button rightSearchButton = new Button("Search");
     private static final HBox rightSearchGroup = new HBox(rightSearchField, rightSearchButton);
@@ -90,7 +90,8 @@ public class Main extends Application {
     }
 
     /**
-     * Formats weather report elements in main frame given {@link org.nothing.jocularweather.Report} object.
+     * Formats weather report elements in main frame given
+     * {@link org.nothing.jocularweather.Report} object.
      *
      * @param report Populated weather report
      */
@@ -122,6 +123,8 @@ public class Main extends Application {
                 sunriseBox.setContentText(sunriseTime);
                 sunsetBox.setContentText(sunsetTime);
 
+                titleLabel.setText(String.format("%s, %s", cityName, country));
+
                 // Set condition icon
                 try {
                     conditionsBox.getIcon()
@@ -147,6 +150,7 @@ public class Main extends Application {
     @Override
     public void start(Stage stage) {
         scene.getStylesheets().add("style.css");
+        titleLabel.setId("title-label");
         // Pull saved locations from database and get current report
         Logger.print(MessageType.JW_INFO, "Starting JocularWeather.jar.EXE");
         ArrayList<String> savedLocations = Fetcher.getSavedLocations();

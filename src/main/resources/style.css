@@ -1,11 +1,25 @@
+* {
+  -fx-font-family: sans-serif, bold;
+}
+
 .hbox {
-  -fx-background-color: #adfffc;
-  background-color: #adfffc;
+  -fx-background-color: #8ec4e6;
+  background-color: #8ec4e6;
 }
 
 .left-pane {
-  -fx-background-color: #adfffc;
-  background-color: #adfffc;
+  -fx-background-color: #457b9d;
+  background-color: #457b9d;
+}
+
+#title-label {
+  -fx-font-weight: bold;
+
+  -fx-font-size: 24px;
+}
+
+.header-label {
+  -fx-font-weight: bold;
 }
 /* .stack-pane {
   -fx-background-color: #ff00bf;
