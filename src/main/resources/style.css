@@ -1,5 +1,9 @@
+@font-face {
+  src: url("Figtree.ttf");
+}
+
 * {
-  -fx-font-family: sans-serif, bold;
+  -fx-font-family: Figtree, bold;
 }
 
 .hbox {
