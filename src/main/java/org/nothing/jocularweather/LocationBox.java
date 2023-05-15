@@ -45,7 +45,7 @@ public class LocationBox extends HBox {
         deleteButton.setPrefSize(20, 20);
 
         this.setPrefWidth(220);
-        this.setMinWidth(220);
+        this.setMinWidth(200);
 
         this.setAlignment(Pos.CENTER_LEFT);
         this.setPadding(new Insets(10));

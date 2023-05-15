@@ -54,9 +54,8 @@ public class Main extends Application {
     private static final VBox locationsGroup = new VBox();
     private static final VBox leftPane = new VBox();
 
-    // Scene scene = new Scene(allContent, 720, 480);
     private static final HBox allContent = new HBox();
-    private static final Scene scene = new Scene(allContent, 720, 480);
+    private static final Scene scene = new Scene(allContent, 750, 480);
 
     private final Fetcher fetcher = new Fetcher();
     private final ArrayList<LocationBox> savedLocationBoxes = new ArrayList<>();
@@ -81,7 +80,7 @@ public class Main extends Application {
     }
 
     /**
-     * Runs program
+     * Runs program.
      *
      * @param args Command line arguments; unused
      */
@@ -204,8 +203,8 @@ public class Main extends Application {
         // Set spacing for pane parent objects
         leftPane.setPadding(new Insets(30));
         leftPane.setSpacing(10);
-        leftPane.setPrefWidth(220);
-        leftPane.setMinWidth(220);
+        leftPane.setPrefWidth(250);
+        leftPane.setMinWidth(250);
         leftPane.setAlignment(Pos.TOP_LEFT);
         leftPane.getStyleClass().add("left-pane");
 
