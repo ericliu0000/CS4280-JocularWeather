@@ -205,6 +205,7 @@ public class Main extends Application {
         leftPane.setAlignment(Pos.TOP_LEFT);
         leftPane.getStyleClass().add("left-pane");
 
+        rightPane.setPadding(new Insets(30));
         rightPane.setSpacing(10);
         rightPane.setPrefWidth(500);
         HBox.setHgrow(rightPane, Priority.ALWAYS);
