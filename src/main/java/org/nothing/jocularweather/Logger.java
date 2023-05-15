@@ -27,7 +27,7 @@ public class Logger {
     /**
      * Prints out text with specified message type.
      *
-     * @param type type of message as specified in {@code MessageType}
+     * @param type type of message as specified in {@link org.nothing.jocularweather.MessageType}
      * @param text text to output to console
      */
     public static void print(MessageType type, String text) {

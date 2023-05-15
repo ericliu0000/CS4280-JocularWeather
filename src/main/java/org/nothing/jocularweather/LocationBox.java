@@ -72,7 +72,7 @@ public class LocationBox extends HBox {
     }
 
     /**
-     * Returns zip code of city
+     * Returns zip code of city.
      *
      * @return String zip code
      */
@@ -81,7 +81,7 @@ public class LocationBox extends HBox {
     }
 
     /**
-     * Returns delete button object
+     * Returns delete button object.
      *
      * @return Button
      */

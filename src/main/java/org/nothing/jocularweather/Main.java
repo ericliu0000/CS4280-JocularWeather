@@ -90,7 +90,7 @@ public class Main extends Application {
     }
 
     /**
-     * Formats weather report elements in main frame given Report object.
+     * Formats weather report elements in main frame given {@link org.nothing.jocularweather.Report} object.
      *
      * @param report Populated weather report
      */
@@ -198,7 +198,7 @@ public class Main extends Application {
         jokeGroup.setAlignment(Pos.CENTER);
 
         // Set spacing for pane parent objects
-        leftPane.setPadding(new Insets(10));
+        leftPane.setPadding(new Insets(30));
         leftPane.setSpacing(10);
         leftPane.setPrefWidth(220);
         leftPane.setMinWidth(220);
@@ -217,7 +217,6 @@ public class Main extends Application {
         allContent.getStyleClass().add("hbox");
         allContent.getChildren().addAll(leftPane, rightPane);
         HBox.setHgrow(allContent, Priority.ALWAYS);
-        allContent.setPadding(new Insets(20));
 
         stage.setScene(scene);
         stage.show();

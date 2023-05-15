@@ -65,7 +65,7 @@ public class InfoBox extends VBox {
     }
 
     /**
-     * Set body text
+     * Set body text.
      *
      * @param text desired text
      */
@@ -74,9 +74,9 @@ public class InfoBox extends VBox {
     }
 
     /**
-     * Returns icon object
+     * Returns icon object.
      *
-     * @return Icon current icon object
+     * @return current icon object
      */
     public ImageView getIcon() {
         return icon;
