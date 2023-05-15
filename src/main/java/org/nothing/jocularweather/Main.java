@@ -30,7 +30,8 @@ public class Main extends Application {
     private static final Button rightSearchButton = new Button("Search");
     private static final HBox rightSearchGroup = new HBox(rightSearchField, rightSearchButton);
     private static final Label locationLabel = new Label("");
-    private static final Image conditionsIcon = new Image(String.valueOf(Main.class.getResource("/icons/01d.png")), 20, 20, false, false);
+    private static final Image conditionsIcon = new Image(String.valueOf(Main.class.getResource("/icons/01d.png")), 20,
+            20, false, false);
     private static final InfoBox feelsLikeBox = new InfoBox("Feels like", "");
     private static final InfoBox tempBox = new InfoBox("Current temperature", "");
     private static final InfoBox conditionsBox = new InfoBox("Conditions", "", conditionsIcon);
@@ -39,7 +40,8 @@ public class Main extends Application {
     private static final InfoBox windBox = new InfoBox("Wind", "");
     private static final InfoBox sunriseBox = new InfoBox("Sunrise", "");
     private static final InfoBox sunsetBox = new InfoBox("Sunset", "");
-    private static final FlowPane contentGroup = new FlowPane(feelsLikeBox, tempBox, conditionsBox, humidityBox, pressureBox, windBox, sunriseBox, sunsetBox);
+    private static final FlowPane contentGroup = new FlowPane(feelsLikeBox, tempBox, conditionsBox, humidityBox,
+            pressureBox, windBox, sunriseBox, sunsetBox);
     private static final VBox contentBox = new VBox(locationLabel, contentGroup);
     private static final Button jokeButton = new Button("Get Joke");
     private static final Label jokeLabel = new Label();
@@ -51,6 +53,10 @@ public class Main extends Application {
     private static final Label leftLabel = new Label("");
     private static final VBox locationsGroup = new VBox();
     private static final VBox leftPane = new VBox();
+
+    // Scene scene = new Scene(allContent, 720, 480);
+    private static final HBox allContent = new HBox();
+    private static final Scene scene = new Scene(allContent, 720, 480);
 
     private final Fetcher fetcher = new Fetcher();
     private final ArrayList<LocationBox> savedLocationBoxes = new ArrayList<>();
@@ -70,7 +76,8 @@ public class Main extends Application {
         time.setTimeZone(new SimpleTimeZone((int) (timeZone * 1000), ""));
         time.setTime(myDate);
 
-        return String.format("%d:%02d %s", time.get(Calendar.HOUR), time.get(Calendar.MINUTE), (time.get(Calendar.AM_PM) == Calendar.AM ? "AM" : "PM"));
+        return String.format("%d:%02d %s", time.get(Calendar.HOUR), time.get(Calendar.MINUTE),
+                (time.get(Calendar.AM_PM) == Calendar.AM ? "AM" : "PM"));
     }
 
     /**
@@ -117,7 +124,11 @@ public class Main extends Application {
 
                 // Set condition icon
                 try {
-                    conditionsBox.getIcon().setImage(new Image(Objects.requireNonNull(Main.class.getResource(String.format("/icons/%s.png", icon))).openStream(), 20, 20, false, false));
+                    conditionsBox.getIcon()
+                            .setImage(new Image(
+                                    Objects.requireNonNull(Main.class.getResource(String.format("/icons/%s.png", icon)))
+                                            .openStream(),
+                                    20, 20, false, false));
                 } catch (IOException e) {
                     Logger.print(MessageType.JW_ERROR, "Could not find icon");
                     e.printStackTrace();
@@ -135,6 +146,7 @@ public class Main extends Application {
 
     @Override
     public void start(Stage stage) {
+        scene.getStylesheets().add("style.css");
         // Pull saved locations from database and get current report
         Logger.print(MessageType.JW_INFO, "Starting JocularWeather.jar.EXE");
         ArrayList<String> savedLocations = Fetcher.getSavedLocations();
@@ -191,30 +203,29 @@ public class Main extends Application {
         leftPane.setPrefWidth(220);
         leftPane.setMinWidth(220);
         leftPane.setAlignment(Pos.TOP_LEFT);
+        leftPane.getStyleClass().add("left-pane");
 
         rightPane.setSpacing(10);
         rightPane.setPrefWidth(500);
         HBox.setHgrow(rightPane, Priority.ALWAYS);
         rightPane.setAlignment(Pos.TOP_CENTER);
 
-
         leftPane.getChildren().addAll(leftSearchGroup, leftLabel, locationsGroup);
         rightPane.getChildren().addAll(titleLabel, rightSearchGroup, locationLabel, contentBox, jokeGroup);
 
         // Assemble entire scene
-        HBox allContent = new HBox(leftPane, rightPane);
+        allContent.getStyleClass().add("hbox");
+        allContent.getChildren().addAll(leftPane, rightPane);
         HBox.setHgrow(allContent, Priority.ALWAYS);
         allContent.setPadding(new Insets(20));
-
-        Scene scene = new Scene(allContent, 720, 480);
-        scene.getStylesheets().add("style.css");
 
         stage.setScene(scene);
         stage.show();
     }
 
     /**
-     * Returns location box given a specific location and its corresponding weather report.
+     * Returns location box given a specific location and its corresponding weather
+     * report.
      *
      * @param zip    5 digit United States ZIP code
      * @param report Report object
