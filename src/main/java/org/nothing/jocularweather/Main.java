@@ -48,6 +48,7 @@ public class Main extends Application {
     private static final TextField leftSearchField = new TextField();
     private static final Button leftSearchButton = new Button("Add");
     private static final HBox leftSearchGroup = new HBox(leftSearchField, leftSearchButton);
+    private static final Label leftLabel = new Label("");
     private static final VBox locationsGroup = new VBox();
     private static final VBox leftPane = new VBox();
 
@@ -151,7 +152,9 @@ public class Main extends Application {
             ReportBase report = entry.getValue();
             Logger.print(MessageType.JW_INFO, report.toString());
 
-            savedLocationBoxes.add(formatLocationBox(zip, report));
+            // Add box iff it is valid
+            Optional<LocationBox> box = formatLocationBox(zip, report);
+            box.ifPresent(savedLocationBoxes::add);
         }
 
         // Put boxes into group
@@ -159,26 +162,17 @@ public class Main extends Application {
 
         // Configure prompts
         leftSearchField.setPromptText("Enter ZIP...");
-        leftSearchField.setOnAction((e) -> {
-            // TODO handle invalid ZIPs properly
-            if (fetcher.addZipToSaved(leftSearchField.getText())) {
-                addLocation(leftSearchField.getText());
-            }
-        });
-        leftSearchButton.setOnAction((e) -> {
-            if (fetcher.addZipToSaved(leftSearchField.getText())) {
-                addLocation(leftSearchField.getText());
-            }
-        });
+        leftSearchField.setOnAction((e) -> addLocation(leftSearchField.getText()));
+        leftSearchButton.setOnAction((e) -> addLocation(leftSearchField.getText()));
 
         rightSearchField.setPromptText("Enter location...");
         rightSearchField.setOnAction((e) -> formatReport(fetcher.getWeatherReport(rightSearchField.getText())));
         rightSearchButton.setOnAction((e) -> formatReport(fetcher.getWeatherReport(rightSearchField.getText())));
         jokeButton.setOnAction((e) -> jokeLabel.setText(Fetcher.getWeatherJoke()));
 
-        // Adjust spacing for right pane content
+        // Adjust spacing for pane content
         leftSearchGroup.setSpacing(20);
-        leftSearchGroup.setPrefWidth(220);
+        leftSearchGroup.setPrefWidth(220); // TODO make left pane correct width even without any location boxes (or, add default box)
         rightSearchGroup.setSpacing(20);
         contentGroup.setPrefWidth(600);
         contentGroup.setHgap(20);
@@ -193,11 +187,12 @@ public class Main extends Application {
         // Set spacing for pane parent object
         leftPane.setPadding(new Insets(10));
         leftPane.setSpacing(10);
+        leftPane.setPrefWidth(200);
         rightPane.setSpacing(10);
         leftPane.setAlignment(Pos.TOP_LEFT);
         rightPane.setAlignment(Pos.TOP_CENTER);
 
-        leftPane.getChildren().addAll(leftSearchGroup, locationsGroup);
+        leftPane.getChildren().addAll(leftSearchGroup, leftLabel, locationsGroup);
         rightPane.getChildren().addAll(titleLabel, rightSearchGroup, locationLabel, contentBox, jokeGroup);
 
         // Assemble entire scene
@@ -219,22 +214,33 @@ public class Main extends Application {
      * @param report Report object
      * @return LocationBox associated location box
      */
-    private LocationBox formatLocationBox(String zip, ReportBase report) {
+    private Optional<LocationBox> formatLocationBox(String zip, ReportBase report) {
         LocationBox box;
-        if (report.type().equals(ResultType.OKAY)) {
-            // Set up correctly formatted weather
-            Report weather = (Report) report;
-            box = new LocationBox(String.format("%s, %s", weather.name(), weather.sys().country()), zip);
-            box.setCondition(weather.weather().get(0).main());
-            box.setTemperature(String.format("%s °F", weather.main().temp()));
+        switch (report.type()) {
+            // TODO log
+            case OKAY -> {
+                leftLabel.setText("");
+                // Set up correctly formatted weather
+                Report weather = (Report) report;
+                box = new LocationBox(String.format("%s, %s", weather.name(), weather.sys().country()), zip);
+                box.setCondition(weather.weather().get(0).main());
+                box.setTemperature(String.format("%s °F", weather.main().temp()));
 
-            // Set updater for bringing saved location into focus
-            box.setOnMouseClicked((e) -> formatReport(fetcher.getWeatherReport(box.getZip())));
-        } else {
-            // Show malformed location box
-            box = new LocationBox("Couldn't find", zip);
-            box.setCondition(zip);
-            box.setTemperature("☒☒ °F");
+                // Set updater for bringing saved location into focus
+                box.setOnMouseClicked((e) -> formatReport(fetcher.getWeatherReport(box.getZip())));
+            }
+            case API_ERROR -> {
+                leftLabel.setText("Couldn't connect to API");
+                return Optional.empty();
+            }
+            case LOCATION_NOT_FOUND -> {
+                leftLabel.setText("Couldn't find location: " + zip);
+                return Optional.empty();
+            }
+            default -> {
+                leftLabel.setText("Something went wrong!");
+                return Optional.empty();
+            }
         }
 
         // Configure delete action
@@ -246,7 +252,7 @@ public class Main extends Application {
             locationsGroup.getChildren().addAll(savedLocationBoxes);
         });
 
-        return box;
+        return Optional.of(box);
     }
 
     /**
@@ -256,11 +262,18 @@ public class Main extends Application {
      */
     private void addLocation(String zip) {
         if (fetcher.addZipToSaved(zip)) {
-            savedLocationBoxes.add(formatLocationBox(zip, fetcher.getWeatherReport(zip)));
+            // TODO log
+            leftLabel.setText("");
+
+            // Add location box if valid
+            Optional<LocationBox> box = formatLocationBox(zip, fetcher.getWeatherReport(zip));
+            box.ifPresent(savedLocationBoxes::add);
 
             // Refresh locations
             locationsGroup.getChildren().clear();
             locationsGroup.getChildren().addAll(savedLocationBoxes);
+        } else {
+            leftLabel.setText("Not a valid ZIP code. Please try again.");
         }
     }
 }

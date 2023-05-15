@@ -245,11 +245,11 @@ public class Fetcher {
      * @return whether method succeeded
      */
     public boolean addZipToSaved(String zip) {
-        Logger.print(MessageType.JW_INFO, "Adding " + zip + " to saved locations");
         if (isNotZip(zip)) {
             return false;
         }
 
+        Logger.print(MessageType.JW_INFO, "Adding " + zip + " to saved locations");
         try (FileWriter writer = new FileWriter("src/main/resources/locationStorage.txt", true)) {
             writer.append("\n").append(zip);
             return true;
