@@ -5,5 +5,4 @@ public enum ResultType {
     LOCATION_NOT_FOUND,
     API_ERROR,
     NOT_OKAY
-
 }

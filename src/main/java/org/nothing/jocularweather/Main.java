@@ -171,10 +171,11 @@ public class Main extends Application {
         jokeButton.setOnAction((e) -> jokeLabel.setText(Fetcher.getWeatherJoke()));
 
         // Adjust spacing for pane content
+        leftSearchButton.setMinWidth(60);
         leftSearchGroup.setSpacing(20);
-        leftSearchGroup.setPrefWidth(220); // TODO make left pane correct width even without any location boxes (or, add default box)
+        leftSearchGroup.setPrefWidth(220);
         rightSearchGroup.setSpacing(20);
-        contentGroup.setPrefWidth(600);
+
         contentGroup.setHgap(20);
         contentGroup.setPadding(new Insets(10));
 
@@ -184,13 +185,18 @@ public class Main extends Application {
         contentBox.setAlignment(Pos.CENTER);
         jokeGroup.setAlignment(Pos.CENTER);
 
-        // Set spacing for pane parent object
+        // Set spacing for pane parent objects
         leftPane.setPadding(new Insets(10));
         leftPane.setSpacing(10);
-        leftPane.setPrefWidth(200);
-        rightPane.setSpacing(10);
+        leftPane.setPrefWidth(220);
+        leftPane.setMinWidth(220);
         leftPane.setAlignment(Pos.TOP_LEFT);
+
+        rightPane.setSpacing(10);
+        rightPane.setPrefWidth(500);
+        HBox.setHgrow(rightPane, Priority.ALWAYS);
         rightPane.setAlignment(Pos.TOP_CENTER);
+
 
         leftPane.getChildren().addAll(leftSearchGroup, leftLabel, locationsGroup);
         rightPane.getChildren().addAll(titleLabel, rightSearchGroup, locationLabel, contentBox, jokeGroup);
