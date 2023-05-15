@@ -3,8 +3,9 @@ package org.nothing.jocularweather;
 import java.util.List;
 
 /**
- * Parent class for JSON object from weather report. Follows
- * <a href="https://openweathermap.org/current#current_JSON">...</a>
+ * Parent class for JSON object from weather report. Follows <a href="https://openweathermap.org/current#current_JSON">API docs here</a>.
+ * This implementation assumes that everything is okay; all usages of the class are initialized with the {@link org.nothing.jocularweather.ReportType#OKAY} type or
+ * otherwise deferred to the {@link org.nothing.jocularweather.MalformedReport} type.
  *
  * @param coord      location of station
  * @param weather    qualitative overview of weather
@@ -25,7 +26,7 @@ import java.util.List;
 public record Report(Coordinates coord, List<Weather> weather, String base, Details main, int visibility, Wind wind,
                      Clouds clouds, Rain rain, Snow snow, int dt, WxSystem sys, int timezone, int id, String name,
                      int cod) implements ReportBase {
-    private static final ResultType type = ResultType.OKAY;
+    private static final ReportType type = ReportType.OKAY;
 
     @Override
     public String toString() {
@@ -33,13 +34,22 @@ public record Report(Coordinates coord, List<Weather> weather, String base, Deta
     }
 
     @Override
-    public ResultType type() {
+    public ReportType type() {
         return type;
     }
 }
 
-record MalformedReport(ResultType type) implements ReportBase {
-
+/**
+ * Object implementing {@link org.nothing.jocularweather.ReportBase} which contains no information and a message
+ * containing its error type.
+ *
+ * @param type type of error
+ */
+record MalformedReport(ReportType type) implements ReportBase {
+    @Override
+    public String toString() {
+        return type.toString();
+    }
 }
 
 /**

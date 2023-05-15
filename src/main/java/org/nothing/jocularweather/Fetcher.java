@@ -177,7 +177,7 @@ public class Fetcher {
         } catch (IOException | URISyntaxException e) {
             Logger.print(MessageType.JW_ERROR, "API couldn't be opened");
             e.printStackTrace();
-            return new MalformedReport(ResultType.API_ERROR);
+            return new MalformedReport(ReportType.API_ERROR);
         }
 
         // Pull data from API
@@ -189,7 +189,7 @@ public class Fetcher {
             }
         } catch (IOException e) {
             Logger.print(MessageType.JW_ERROR, "Location not found");
-            return new MalformedReport(ResultType.LOCATION_NOT_FOUND);
+            return new MalformedReport(ReportType.LOCATION_NOT_FOUND);
         }
 
         try {
