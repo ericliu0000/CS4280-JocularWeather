@@ -246,6 +246,7 @@ public class Main extends Application {
         allContent.getChildren().addAll(leftPane, rightPane);
         HBox.setHgrow(allContent, Priority.ALWAYS);
 
+        stage.getIcons().add(new Image("/ico.png"));
         stage.setScene(scene);
         stage.show();
     }
