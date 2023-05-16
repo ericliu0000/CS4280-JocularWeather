@@ -4,6 +4,7 @@ import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.control.OverrunStyle;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
@@ -19,7 +20,7 @@ import javafx.scene.layout.VBox;
 public class LocationBox extends HBox {
     private final Label conditionLabel = new Label("Not available");
     private final Label temperatureLabel = new Label("nn");
-    private final Button deleteButton = new Button("❌");
+    private final Button deleteButton = new Button("X");
 
     private final String zip;
 
@@ -42,7 +43,8 @@ public class LocationBox extends HBox {
         Region centerBuffer = new Region();
         HBox.setHgrow(centerBuffer, Priority.ALWAYS);
 
-        deleteButton.setAlignment(Pos.TOP_RIGHT);
+        deleteButton.setAlignment(Pos.CENTER_RIGHT);
+        deleteButton.setTextOverrun(OverrunStyle.CLIP);
         deleteButton.setPrefSize(20, 20);
 
         this.setPrefWidth(220);
@@ -57,7 +59,7 @@ public class LocationBox extends HBox {
         this.setSpacing(5);
         this.getChildren().addAll(leftGroup, centerBuffer, temperatureLabel, deleteButton);
         this.getStyleClass().add("location-box");
-        this.setMargin(centerBuffer, getInsets());
+        setMargin(centerBuffer, getInsets());
 
     }
 

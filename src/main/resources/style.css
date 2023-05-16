@@ -1,3 +1,7 @@
+@font-face {
+  src: url("/Figtree.ttf");
+}
+
 * {
   -fx-font-family: "Figtree", sans-serif, bold;
 }
@@ -28,7 +32,7 @@
 
 .temperature-label {
   -fx-text-background-color: white;
-  -fx-font-size: 20px;
+  -fx-font-size: 16px;
 }
 
 .location-label {
@@ -38,9 +42,11 @@
 
 .delete-button {
   -fx-background-color: transparent;
-  -fx-text-background-color: white;
-  -fx-font-size: 8px;
+  -fx-font-weight: 900;
+  -fx-text-fill: #ff6666;
+  -fx-font-size: 16px;
 }
+
 .location-box {
   -fx-background-color: #457b9d;
   -fx-effect: dropshadow(three-pass-box, rgba(0, 0, 0, 0.8), 10, 0, 0, 0);
@@ -48,34 +54,4 @@
   -fx-background-radius: 10px;
   -fx-border-radius: 10px;
   -fx-text-background-color: white;
-}
-/* .stack-pane {
-  -fx-background-color: #ff00bf;
-}
-
-* {
-  -fx-font-family: "IBM Plex Sans", sans-serif;
-}
-
-#title-label {
-  -fx-font-weight: bold;
-  -fx-font-size: 48px;
-}
-
-#timer-label {
-  -fx-font-size: 64px;
-}
-
-#mode-label {
-  -fx-background-color: #00b3ff;
-  -fx-text-fill: white;
-  -fx-padding: 2px 5px 2px 5px;
-  -fx-background-radius: 50px;
-
-  -fx-border-radius: 50px;
-} */
-
-@font-face {
-  font-family: "Figtree";
-  src: url("Figtree.ttf");
 }
