@@ -27,7 +27,7 @@ import java.util.*;
  * <br>
  * Mostly completed by 2023-05-17
  * <br><br>
- * Honor Code Pledge
+ * We pledge that we honor code.
  *
  * @author Eric Liu
  * @author Ganning Xu
