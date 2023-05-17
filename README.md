@@ -14,7 +14,7 @@ All weather data is retrieved from the OpenWeatherMap API.
 
 ## Data Storage
 
-We created an AWS Lambda function that can receive a zip code and store it in a Supabase table. This serverless architecture allows us to also extract the IP address and location of the incoming request.
+We created an AWS Lambda function that can receive a ZIP code and store it in a Supabase table. This serverless architecture allows us to also extract the IP address and location of the incoming request.
 
 This serverless function was written in `node.js` using the Serverless framework, which makes deploying to AWS easier.
 
@@ -22,13 +22,13 @@ Documentation:
 
 `GET` `https://98q0kalf91.execute-api.us-east-1.amazonaws.com/pushdb?zip=<zip>&lon=<longitude>&lat=<latitude>`
 
-- Making a `GET` request to this URL will push the zipcode, longitude, and latitude, all to Supabase.
+- Making a `GET` request to this URL will push the ZIP code, longitude, and latitude to Supabase.
 
 `GET` `https://98q0kalf91.execute-api.us-east-1.amazonaws.com/ip`
 
-- Making a `GET` request to this URL will return the city that's associated with the source IP address
+- Making a `GET` request to this URL will return the city that's associated with the source IP address.
 
-<details><summary>The AWS Lambda code for /pushdb can be found below:</summary>
+<details><summary>The AWS Lambda code for <code>/pushdb</code> can be found below:</summary>
   
 ```js
 const { createClient } = require("@supabase/supabase-js");
@@ -121,7 +121,7 @@ return { country, city, regionName };
 
 </details>
 
-<details><summary>The AWS Lambda code for /ip can be found below:</summary>
+<details><summary>The AWS Lambda code for <code>/ip</code> can be found below:</summary>
 
 
 ```js
@@ -147,11 +147,11 @@ async function getLocFromIP(ip) {
 
   return { country, city, regionName };
 }
-````
+```
 
 </details>
 
-<details><summary>The package.json file (for required dependencies) can be found below:</summary>
+<details><summary>The <code>package.json</code> file (for required dependencies) can be found below:</summary>
 ```json
 {
   "name": "zip-code-pusher",
