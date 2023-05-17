@@ -6,6 +6,7 @@ import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.control.OverrunStyle;
 import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.layout.FlowPane;
@@ -19,12 +20,17 @@ import java.util.*;
 
 /**
  * Main class for JocularWeather application.<br>
- * JocularWeather is a free and open-source software as a service, developed with the goal of making weather data more
- * accessible, light-hearted and enjoyable to those who need it the most. Plus, it collects less data than competing
- * services but is much more transparent about it. It uses the <a href="https://openweathermap.org/api">OpenWeatherMap API</a>.
+ * JocularWeather is a free and open-source software as a service, developed
+ * with the goal of making weather data more
+ * accessible, light-hearted and enjoyable to those who need it the most. Plus,
+ * it collects less data than competing
+ * services but is much more transparent about it. It uses the
+ * <a href="https://openweathermap.org/api">OpenWeatherMap API</a>.
  *
- * <br>CS4280
- * <br>2023-05-17
+ * <br>
+ * CS4280
+ * <br>
+ * 2023-05-17
  *
  * @author Eric Liu
  * @author Ganning Xu
@@ -61,7 +67,7 @@ public class Main extends Application {
     private static final VBox leftPane = new VBox();
 
     private static final HBox allContent = new HBox();
-    private static final Scene scene = new Scene(allContent, 780, 480);
+    private static final Scene scene = new Scene(allContent, 780, 520);
 
     private final Fetcher fetcher = new Fetcher();
     private final ArrayList<LocationBox> savedLocationBoxes = new ArrayList<>();
@@ -215,6 +221,12 @@ public class Main extends Application {
         rightSearchButton.setOnAction((e) -> formatReport(fetcher.getWeatherReport(rightSearchField.getText())));
         jokeButton.setOnAction((e) -> jokeLabel.setText(Fetcher.getWeatherJoke()));
 
+        leftSearchButton.getStyleClass().add("left-button");
+        rightSearchButton.getStyleClass().add("button");
+        jokeButton.getStyleClass().add("button");
+        leftSearchField.getStyleClass().add("search");
+        rightSearchField.getStyleClass().add("search");
+
         // Adjust spacing for pane content
         leftSearchButton.setMinWidth(60);
         leftSearchGroup.setSpacing(20);
@@ -226,10 +238,16 @@ public class Main extends Application {
         jokeGroup.setSpacing(10);
 
         // Align everything in right pane and push together
+        leftSearchGroup.setAlignment(Pos.CENTER);
         rightSearchGroup.setAlignment(Pos.CENTER);
         contentGroup.setAlignment(Pos.CENTER);
         contentBox.setAlignment(Pos.CENTER);
         jokeGroup.setAlignment(Pos.CENTER);
+
+        // Configure joke text wrapping
+        jokeLabel.setPrefSize(400, 80);
+        jokeLabel.setTextOverrun(OverrunStyle.CLIP);
+        jokeLabel.setWrapText(true);
 
         // Set spacing for pane parent objects
         leftPane.setPadding(new Insets(30));
@@ -260,7 +278,8 @@ public class Main extends Application {
     }
 
     /**
-     * Returns an optional {@link org.nothing.jocularweather.LocationBox} given a specific location and its
+     * Returns an optional {@link org.nothing.jocularweather.LocationBox} given a
+     * specific location and its
      * corresponding weather report.
      *
      * @param zip    5 digit United States ZIP code

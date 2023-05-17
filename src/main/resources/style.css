@@ -50,8 +50,30 @@
 .location-box {
   -fx-background-color: #457b9d;
   -fx-effect: dropshadow(three-pass-box, rgba(0, 0, 0, 0.8), 10, 0, 0, 0);
-
   -fx-background-radius: 10px;
   -fx-border-radius: 10px;
   -fx-text-background-color: white;
+}
+
+.button {
+  -fx-background-color: #457b9d;
+  -fx-text-fill: white;
+  -fx-font-weight: bold;
+  -fx-font-size: 14px;
+  -fx-background-radius: 8px;
+  -fx-border-radius: 8px;
+}
+
+.left-button {
+  -fx-background-color: #8ec4e6;
+  -fx-text-fill: white;
+  -fx-font-weight: bold;
+  -fx-font-size: 14px;
+  -fx-background-radius: 8px;
+  -fx-border-radius: 8px;
+}
+
+.search {
+  -fx-background-radius: 8px;
+  -fx-border-radius: 8px;
 }
