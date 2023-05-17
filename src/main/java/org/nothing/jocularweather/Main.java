@@ -20,30 +20,25 @@ import java.util.*;
 
 /**
  * Main class for JocularWeather application.<br>
- * JocularWeather is a free and open-source software as a service, developed
- * with the goal of making weather data more
- * accessible, light-hearted and enjoyable to those who need it the most. Plus,
- * it collects less data than competing
- * services but is much more transparent about it. It uses the
- * <a href="https://openweathermap.org/api">OpenWeatherMap API</a>.
+ * JocularWeather is a free and open-source software as a service, developed with the goal of making weather data more accessible, light-hearted and enjoyable to those who need it the most. Plus, it collects less data than competing services but is much more transparent about it. It uses the <a href="https://openweathermap.org/api">OpenWeatherMap API</a> to read in weather data.
  *
  * <br>
  * CS4280
  * <br>
- * 2023-05-17
+ * Mostly completed by 2023-05-17
+ * <br><br>
+ * Honor Code Pledge
  *
  * @author Eric Liu
  * @author Ganning Xu
  */
 public class Main extends Application {
-
     private static final Label titleLabel = new Label("JocularWeather.jar.EXE");
     private static final TextField rightSearchField = new TextField();
     private static final Button rightSearchButton = new Button("Search");
     private static final HBox rightSearchGroup = new HBox(rightSearchField, rightSearchButton);
     private static final Label statusLabel = new Label("");
-    private static final Image conditionsIcon = new Image(String.valueOf(Main.class.getResource("/icons/01d.png")), 20,
-            20, false, false);
+    private static final Image conditionsIcon = new Image(String.valueOf(Main.class.getResource("/icons/01d.png")), 20, 20, false, false);
     private static final InfoBox feelsLikeBox = new InfoBox("Feels like", "");
     private static final InfoBox tempBox = new InfoBox("Current temperature", "");
     private static final InfoBox conditionsBox = new InfoBox("Conditions", "", conditionsIcon);
@@ -166,7 +161,7 @@ public class Main extends Application {
     }
 
     /**
-     * Instantializes empty weather report fields
+     * Instantializes empty weather report fields.
      */
     public void clearFields() {
         feelsLikeBox.setContentText("");
@@ -184,6 +179,7 @@ public class Main extends Application {
     public void start(Stage stage) {
         scene.getStylesheets().add("style.css");
         titleLabel.setId("title-label");
+
         // Pull saved locations from database and get current report
         Logger.print(MessageType.JW_INFO, "Starting JocularWeather.jar.EXE");
         ArrayList<String> savedLocations = Fetcher.getSavedLocations();
@@ -201,13 +197,12 @@ public class Main extends Application {
             ReportBase report = entry.getValue();
             Logger.print(MessageType.JW_INFO, report.toString());
 
-            // Add box iff it is valid
+            // Add box if and only if it is valid
             Optional<LocationBox> box = formatLocationBox(zip, report);
             box.ifPresent(savedLocationBoxes::add);
         }
 
         // Put boxes into group
-
         locationsGroup.setSpacing(10);
         locationsGroup.getChildren().addAll(savedLocationBoxes);
 
@@ -221,6 +216,7 @@ public class Main extends Application {
         rightSearchButton.setOnAction((e) -> formatReport(fetcher.getWeatherReport(rightSearchField.getText())));
         jokeButton.setOnAction((e) -> jokeLabel.setText(Fetcher.getWeatherJoke()));
 
+        // Assign buttons and fields to style classes
         leftSearchButton.getStyleClass().add("left-button");
         rightSearchButton.getStyleClass().add("button");
         jokeButton.getStyleClass().add("button");
@@ -260,8 +256,8 @@ public class Main extends Application {
         rightPane.setPadding(new Insets(30));
         rightPane.setSpacing(10);
         rightPane.setPrefWidth(500);
-        HBox.setHgrow(rightPane, Priority.ALWAYS);
         rightPane.setAlignment(Pos.TOP_CENTER);
+        HBox.setHgrow(rightPane, Priority.ALWAYS);
 
         leftPane.getChildren().addAll(leftSearchGroup, leftLabel, locationsGroup);
         rightPane.getChildren().addAll(titleLabel, rightSearchGroup, statusLabel, contentBox, jokeGroup);

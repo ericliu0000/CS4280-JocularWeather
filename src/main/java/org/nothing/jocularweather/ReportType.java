@@ -1,8 +1,10 @@
 package org.nothing.jocularweather;
 
 /**
- * Enumeration for type of report response. Assigned to {@link org.nothing.jocularweather.Report} and {@link org.nothing.jocularweather.MalformedReport} depending on
- * weather system API output.
+ * Enumeration for type of report response. Assigned to {@link org.nothing.jocularweather.Report} and {@link org.nothing.jocularweather.MalformedReport} depending on weather system API output.
+ *
+ * @author Eric Liu
+ * @author Ganning Xu
  */
 public enum ReportType {
     /**
@@ -18,7 +20,7 @@ public enum ReportType {
      */
     API_ERROR,
     /**
-     * Catch-all other report fault
+     * Catch-all other report faults
      */
     NOT_OKAY
 }
