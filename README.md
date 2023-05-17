@@ -2,6 +2,16 @@
 
 _Eric Liu, Ganning Xu_
 
+JocularWeather.jar.EXE is a free and open-source Software as a Service (SaaS) developed with the goal of making weather data more accessible, light-hearted, and enjoyable to those who need it the most. It accomplishes this by using open-use APIs to source information about the weather as well as other local environmental and social conditions.
+
+This application embodies an effort to be more approachable and human. Therefore, we seek to identify the parts of any application that a normal human would most dearly appreciate.
+
+**Documentation:** [https://ericliu0000.github.io/CS4280-JocularWeather/apidocs](https://ericliu0000.github.io/CS4280-JocularWeather/apidocs)
+
+## Weather Data
+
+All weather data is retrieved from the OpenWeatherMap API.
+
 ## Data Storage
 
 We created an AWS Lambda function that can receive a zip code and store it in a Supabase table. This serverless architecture allows us to also extract the IP address and location of the incoming request.
@@ -17,8 +27,6 @@ Documentation:
 `GET` `https://98q0kalf91.execute-api.us-east-1.amazonaws.com/ip`
 
 - Making a `GET` request to this URL will return the city that's associated with the source IP address
-
-
 
 <details><summary>The AWS Lambda code for /pushdb can be found below:</summary>
   
@@ -36,80 +44,81 @@ const supabase = createClient(supabaseUrl, supabaseKey);
 
 // Define AWS Lambda handler function
 module.exports.handler = async (event) => {
-  // Retrieve zip code, longitude, and latitude from query parameters
-  const zipCode = event.queryStringParameters.zip;
-  const lon = event.queryStringParameters.lon;
-  const lat = event.queryStringParameters.lat;
+// Retrieve zip code, longitude, and latitude from query parameters
+const zipCode = event.queryStringParameters.zip;
+const lon = event.queryStringParameters.lon;
+const lat = event.queryStringParameters.lat;
 
-  // Check if zip code is valid
-  if (zipCode === undefined || zipCode === null || zipCode === "") {
-    return {
-      statusCode: 400,
-      body: JSON.stringify({
-        error: "Invalid zip code",
-      }),
-    };
-  }
+// Check if zip code is valid
+if (zipCode === undefined || zipCode === null || zipCode === "") {
+return {
+statusCode: 400,
+body: JSON.stringify({
+error: "Invalid zip code",
+}),
+};
+}
 
-  let sourceIp;
-  let userAgent;
-  let loc = null;
+let sourceIp;
+let userAgent;
+let loc = null;
 
-  try {
-    // Retrieve user's IP address and location information using an external API
-    sourceIp = event.requestContext?.http.sourceIp;
-    loc = await getLocFromIP(sourceIp);
-    userAgent = event.requestContext?.http.userAgent;
-  } catch (error) {
-    // Return error response if location information cannot be retrieved
-    return {
-      statusCode: 500,
-      body: JSON.stringify({
-        error: "Error getting location",
-      }),
-    };
-  }
+try {
+// Retrieve user's IP address and location information using an external API
+sourceIp = event.requestContext?.http.sourceIp;
+loc = await getLocFromIP(sourceIp);
+userAgent = event.requestContext?.http.userAgent;
+} catch (error) {
+// Return error response if location information cannot be retrieved
+return {
+statusCode: 500,
+body: JSON.stringify({
+error: "Error getting location",
+}),
+};
+}
 
-  // Insert new record into Supabase database table
-  const { data, error } = await supabase.from("zips").insert({
-    zip: zipCode,
-    sourceIp: sourceIp,
-    userAgent: userAgent,
-    country: loc?.country,
-    city: loc?.city,
-    regionName: loc?.regionName,
-    lon: lon,
-    lat: lat,
-  });
+// Insert new record into Supabase database table
+const { data, error } = await supabase.from("zips").insert({
+zip: zipCode,
+sourceIp: sourceIp,
+userAgent: userAgent,
+country: loc?.country,
+city: loc?.city,
+regionName: loc?.regionName,
+lon: lon,
+lat: lat,
+});
 
-  // Log any errors that occur during the database insert operation
-  if (error) {
-    console.log(error);
-  }
+// Log any errors that occur during the database insert operation
+if (error) {
+console.log(error);
+}
 
-  // Return success response with inserted record data and original event information
-  return {
-    statusCode: 200,
-    body: JSON.stringify({
-      data: data,
-      event: event,
-    }),
-  };
+// Return success response with inserted record data and original event information
+return {
+statusCode: 200,
+body: JSON.stringify({
+data: data,
+event: event,
+}),
+};
 };
 
 // Helper function to retrieve location information from IP address
 async function getLocFromIP(ip) {
-  const ENDPOINT = `http://ip-api.com/json/${ip}`;
+const ENDPOINT = `http://ip-api.com/json/${ip}`;
 
-  const resp = await fetch(ENDPOINT);
-  const data = await resp.json();
+const resp = await fetch(ENDPOINT);
+const data = await resp.json();
 
-  const { country, city, regionName } = data;
+const { country, city, regionName } = data;
 
-  return { country, city, regionName };
+return { country, city, regionName };
 }
-```
-  
+
+````
+
 </details>
 
 <details><summary>The AWS Lambda code for /ip can be found below:</summary>
@@ -138,8 +147,8 @@ async function getLocFromIP(ip) {
 
   return { country, city, regionName };
 }
-```
-  
+````
+
 </details>
 
 <details><summary>The package.json file (for required dependencies) can be found below:</summary>
