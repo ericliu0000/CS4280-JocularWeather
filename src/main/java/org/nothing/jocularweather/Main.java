@@ -18,7 +18,13 @@ import java.io.IOException;
 import java.util.*;
 
 /**
- * Main class for JocularWeather application.
+ * Main class for JocularWeather application.<br>
+ * JocularWeather is a free and open-source software as a service, developed with the goal of making weather data more
+ * accessible, light-hearted and enjoyable to those who need it the most. Plus, it collects less data than competing
+ * services but is much more transparent about it. It uses the <a href="https://openweathermap.org/api">OpenWeatherMap API</a>.
+ *
+ * <br>CS4280
+ * <br>2023-05-17
  *
  * @author Eric Liu
  * @author Ganning Xu
@@ -217,6 +223,7 @@ public class Main extends Application {
 
         contentGroup.setHgap(20);
         contentGroup.setPadding(new Insets(10));
+        jokeGroup.setSpacing(10);
 
         // Align everything in right pane and push together
         rightSearchGroup.setAlignment(Pos.CENTER);
