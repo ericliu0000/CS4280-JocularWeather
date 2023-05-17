@@ -32,17 +32,21 @@ public class LocationBox extends HBox {
      */
     public LocationBox(String locationName, String zip) {
         this.zip = zip;
+        // Create labels for information to go in
         Label locationLabel = new Label();
         locationLabel.setText(locationName);
         temperatureLabel.setAlignment(Pos.CENTER_RIGHT);
 
+        // Group and align data
         VBox leftGroup = new VBox(locationLabel, conditionLabel);
         leftGroup.setAlignment(Pos.CENTER_LEFT);
-        leftGroup.setSpacing(4);
+        leftGroup.setSpacing(5);
 
+        // Set padding between to space out right and left sections
         Region centerBuffer = new Region();
         HBox.setHgrow(centerBuffer, Priority.ALWAYS);
 
+        // Configure deletion button
         deleteButton.setAlignment(Pos.CENTER_RIGHT);
         deleteButton.setTextOverrun(OverrunStyle.CLIP);
         deleteButton.setPrefSize(20, 20);
@@ -50,17 +54,19 @@ public class LocationBox extends HBox {
         this.setPrefWidth(220);
         this.setMinWidth(200);
 
+        // Style elements
         conditionLabel.getStyleClass().add("condition-label");
         temperatureLabel.getStyleClass().add("temperature-label");
         locationLabel.getStyleClass().add("location-label");
         deleteButton.getStyleClass().add("delete-button");
+        this.getStyleClass().add("location-box");
+
+        // Configure alignment and set up object
         this.setAlignment(Pos.CENTER_LEFT);
         this.setPadding(new Insets(10));
         this.setSpacing(5);
         this.getChildren().addAll(leftGroup, centerBuffer, temperatureLabel, deleteButton);
-        this.getStyleClass().add("location-box");
         setMargin(centerBuffer, getInsets());
-
     }
 
     /**

@@ -1,79 +1,79 @@
 @font-face {
-  src: url("/Figtree.ttf");
+    src: url("/Figtree.ttf");
 }
 
 * {
-  -fx-font-family: "Figtree", sans-serif, bold;
+    -fx-font-family: "Figtree", sans-serif, bold;
 }
 
 .hbox {
-  -fx-background-color: #8ec4e6;
-  background-color: #8ec4e6;
+    -fx-background-color: #8ec4e6;
+    background-color: #8ec4e6;
 }
 
 .left-pane {
-  -fx-background-color: #457b9d;
-  background-color: #457b9d;
+    -fx-background-color: #457b9d;
+    background-color: #457b9d;
 }
 
 #title-label {
-  -fx-font-weight: bold;
+    -fx-font-weight: bold;
 
-  -fx-font-size: 24px;
+    -fx-font-size: 24px;
 }
 
 .header-label {
-  -fx-font-weight: bold;
+    -fx-font-weight: bold;
 }
 
 .condition-label {
-  -fx-text-background-color: white;
+    -fx-text-background-color: white;
 }
 
 .temperature-label {
-  -fx-text-background-color: white;
-  -fx-font-size: 16px;
+    -fx-text-background-color: white;
+    -fx-font-size: 16px;
 }
 
 .location-label {
-  -fx-text-background-color: white;
-  -fx-font-weight: bold;
+    -fx-text-background-color: white;
+    -fx-font-weight: bold;
 }
 
 .delete-button {
-  -fx-background-color: transparent;
-  -fx-font-weight: 900;
-  -fx-text-fill: #ff6666;
-  -fx-font-size: 16px;
+    -fx-background-color: transparent;
+    -fx-font-weight: 900;
+    -fx-text-fill: #ff6666;
+    -fx-font-size: 16px;
 }
 
 .location-box {
-  -fx-background-color: #457b9d;
-  -fx-effect: dropshadow(three-pass-box, rgba(0, 0, 0, 0.8), 10, 0, 0, 0);
-  -fx-background-radius: 10px;
-  -fx-border-radius: 10px;
-  -fx-text-background-color: white;
+    -fx-background-color: #457b9d;
+    -fx-effect: dropshadow(three-pass-box, rgba(0, 0, 0, 0.8), 10, 0, 0, 0);
+    -fx-background-radius: 10px;
+    -fx-border-radius: 10px;
+    -fx-text-background-color: white;
 }
 
 .button {
-  -fx-background-color: #457b9d;
-  -fx-text-fill: white;
-  -fx-font-weight: bold;
-  -fx-font-size: 14px;
-  -fx-background-radius: 8px;
-  -fx-border-radius: 8px;
+    -fx-background-color: #457b9d;
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+    -fx-font-size: 14px;
+    -fx-background-radius: 8px;
+    -fx-border-radius: 8px;
 }
 
 .left-button {
-  -fx-background-color: #8ec4e6;
-  -fx-text-fill: white;
-  -fx-font-weight: bold;
-  -fx-font-size: 14px;
-  -fx-background-radius: 8px;
-  -fx-border-radius: 8px;
+    -fx-background-color: #8ec4e6;
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+    -fx-font-size: 14px;
+    -fx-background-radius: 8px;
+    -fx-border-radius: 8px;
 }
 
 .search {
-  -fx-background-radius: 8px;
-  -fx-border-radius: 8px;
+    -fx-background-radius: 8px;
+    -fx-border-radius: 8px;
 }
