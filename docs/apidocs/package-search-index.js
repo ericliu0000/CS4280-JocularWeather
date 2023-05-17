@@ -1,0 +1,1 @@
+packageSearchIndex = [{"l":"All Packages","u":"allpackages-index.html"},{"m":"org.nothing.jocularweather","l":"org.nothing.jocularweather"}];updateSearchResults();
