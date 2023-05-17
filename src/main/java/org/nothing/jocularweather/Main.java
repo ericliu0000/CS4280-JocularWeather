@@ -247,6 +247,7 @@ public class Main extends Application {
         HBox.setHgrow(allContent, Priority.ALWAYS);
 
         stage.getIcons().add(new Image("/ico.png"));
+        stage.setTitle("JocularWeather");
         stage.setScene(scene);
         stage.show();
     }
@@ -262,7 +263,6 @@ public class Main extends Application {
     private Optional<LocationBox> formatLocationBox(String zip, ReportBase report) {
         LocationBox box;
         switch (report.type()) {
-            // TODO log
             case OKAY -> {
                 leftLabel.setText("");
                 // Set up correctly formatted weather
@@ -307,7 +307,6 @@ public class Main extends Application {
      */
     private void addLocation(String zip) {
         if (fetcher.addZipToSaved(zip)) {
-            // TODO log
             leftLabel.setText("");
 
             // Add location box if valid
