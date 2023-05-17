@@ -152,6 +152,7 @@ async function getLocFromIP(ip) {
 </details>
 
 <details><summary>The <code>package.json</code> file (for required dependencies) can be found below:</summary>
+
 ```json
 {
   "name": "zip-code-pusher",
