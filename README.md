@@ -9,6 +9,7 @@ We created an AWS Lambda function that can receive a zip code and store it in a 
 This serverless function was written in `node.js` using the Serverless framework, which makes deploying to AWS easier.
 
 Documentation:
+
 `GET` `https://98q0kalf91.execute-api.us-east-1.amazonaws.com/pushdb?zip=<zip>&lon=<longitude>&lat=<latitude>`
 
 - Making a `GET` request to this URL will push the zipcode, longitude, and latitude, all to Supabase.
@@ -17,8 +18,10 @@ Documentation:
 
 - Making a `GET` request to this URL will return the city that's associated with the source IP address
 
-The AWS (for `/pushdb`) code can be found below:
 
+
+<details><summary>The AWS Lambda code for /pushdb can be found below:</summary>
+  
 ```js
 const { createClient } = require("@supabase/supabase-js");
 const fetch = require("node-fetch");
@@ -106,8 +109,11 @@ async function getLocFromIP(ip) {
   return { country, city, regionName };
 }
 ```
+  
+</details>
 
-The AWS (for `/ip`) code can be found below:
+<details><summary>The AWS Lambda code for /ip can be found below:</summary>
+
 
 ```js
 const fetch = require("node-fetch");
@@ -133,3 +139,28 @@ async function getLocFromIP(ip) {
   return { country, city, regionName };
 }
 ```
+  
+</details>
+
+<details><summary>The package.json file (for required dependencies) can be found below:</summary>
+```json
+{
+  "name": "zip-code-pusher",
+  "version": "1.0.0",
+  "description": "<!-- title: 'AWS Simple HTTP Endpoint example in NodeJS' description: 'This template demonstrates how to make a simple HTTP API with Node.js running on AWS Lambda and API Gateway using the Serverless Framework.' layout: Doc framework: v3 platform: AWS language: nodeJS authorLink: 'https://github.com/serverless' authorName: 'Serverless, inc.' authorAvatar: 'https://avatars1.githubusercontent.com/u/13742415?s=200&v=4' -->",
+  "main": "index.js",
+  "dependencies": {
+    "@supabase/supabase-js": "^2.21.0",
+    "dotenv": "^16.0.3",
+    "node-fetch": "^2.6.11"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
+}
+```
+</details>
